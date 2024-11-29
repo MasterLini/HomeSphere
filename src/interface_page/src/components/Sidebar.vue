@@ -2,18 +2,28 @@
   <div class="d-flex">
     <!-- Sidebar -->
     <div class="bg-light border-end sidebar">
-      <h5 class="sidebar-header p-3">Meine App</h5>
-      <ul class="nav flex-column">
+      <ul class="nav flex-column justify-content-center">
         <li class="nav-item">
-          <router-link to="/" class="nav-link" active-class="active">🏠 Home</router-link>
+          <router-link to="/" class="nav-link" active-class="active" title="Home">
+            🏠
+          </router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/about" class="nav-link" active-class="active">ℹ️ About</router-link>
+          <router-link to="/about" class="nav-link" active-class="active" title="About">
+            ℹ️
+          </router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/contact" class="nav-link" active-class="active">📞 Kontakt</router-link>
+          <router-link to="/contact" class="nav-link" active-class="active" title="Contact">
+            📞
+          </router-link>
         </li>
       </ul>
+      <div class="user-icon mt-auto p-3">
+        <router-link to="/user" class="nav-link" active-class="active" title="User">
+          👤
+        </router-link>
+      </div>
     </div>
 
     <!-- Hauptinhalt -->
@@ -30,37 +40,43 @@ export default {
 </script>
 
 <style scoped>
-/* Sidebar-Styling */
+/* Sidebar Styling */
 .sidebar {
-  width: 250px;
+  width: 80px;
   height: 100vh;
   position: fixed;
   top: 0;
   left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 1rem;
   overflow-y: auto;
   z-index: 1000;
-}
-
-.sidebar-header {
-  font-size: 1.2rem;
-  font-weight: bold;
   background-color: #f8f9fa;
-  text-align: center;
 }
 
 .nav-link {
   color: #333;
-  padding: 0.75rem 1rem;
-  transition: background-color 0.3s;
+  padding: 1rem;
+  transition: background-color 0.3s, transform 0.3s;
+  text-align: center;
+  font-size: 1.5rem;
 }
 
 .nav-link.active,
 .nav-link:hover {
   background-color: #e9ecef;
   color: #000;
+  transform: scale(1.1);
+}
+
+.user-icon {
+  margin-top: auto;
+  padding-bottom: 1rem;
 }
 
 .main-content {
-  margin-left: 250px; /* Gleiche Breite wie Sidebar */
+  margin-left: 80px; /* Gleiche Breite wie Sidebar */
 }
 </style>
