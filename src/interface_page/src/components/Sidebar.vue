@@ -14,6 +14,11 @@
           </router-link>
         </li>
         <li class="nav-item">
+          <router-link to="/todo" class="nav-link" active-class="active" title="ToDo">
+            📜
+          </router-link>
+        </li>
+        <li class="nav-item">
           <router-link to="/contact" class="nav-link" active-class="active" title="Contact">
             📞
           </router-link>
