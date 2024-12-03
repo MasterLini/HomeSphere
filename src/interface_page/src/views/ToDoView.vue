@@ -34,6 +34,8 @@
 
 <script>
 import ToDoItem from "../components/ToDoItem.vue";
+import axios from 'axios';
+const backendUrl = `http://${process.env.VUE_APP_SERVER_IP}:${process.env.VUE_APP_SERVER_PORT}`;
 
 export default {
   name: "todo",
@@ -44,7 +46,8 @@ export default {
     return {
       todoText: "", 
       todoDescription: "",
-      todos: []
+      todos: [],
+      data: ""
     };
   },
   methods: {
@@ -63,6 +66,18 @@ export default {
     },
     updateTodo({ index, completed }) {
       this.todos[index].completed = completed;
+    },
+    async fetchData() {
+      try {
+        const response = await axios.get(backendUrl);
+        this.data = response.data;
+        console.log(this.data)
+      } catch (error) {
+        console.error('Fehler beim Abrufen der Daten:', error);
+      }
+    },
+    mounted() {
+    //this.fetchData();
     }
   }
 };
