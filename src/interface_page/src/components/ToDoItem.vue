@@ -1,6 +1,6 @@
 <template>
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-      <div>
+    
+      <div class="postIt">
         <input 
           type="checkbox" 
           v-model="todo.completed" 
@@ -14,9 +14,9 @@
         <span :class="{ 'text-decoration-line-through': todo.completed }">
           {{ todo.description }}
         </span>
-      </div>
       <button class="btn btn-danger btn-sm" @click="remove">Löschen</button>
-    </li>
+    </div>
+    
   </template>
   
   <script>
@@ -44,6 +44,14 @@
   </script>
   
   <style>
+
+  .postIt {
+    background-image: url('../assets/postit.svg');
+    height: 40vh;
+    width: 40vw;
+    background-repeat: no-repeat;
+  }
+
   .text-decoration-line-through {
     text-decoration: line-through;
   }

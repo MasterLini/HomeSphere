@@ -19,7 +19,7 @@
       <button type="submit" class="btn btn-primary">Hinzufügen</button>
     </form>
 
-    <ul class="list-group mt-4">
+    <div class="postItDiv">
       <ToDoItem 
         v-for="(todo, index) in todos" 
         :key="index" 
@@ -28,7 +28,7 @@
         @remove="removeTodo"
         @update="updateTodo"
       />
-    </ul>
+    </div>
   </div>
 </template>
 
@@ -82,3 +82,10 @@ export default {
   }
 };
 </script>
+<style>
+.postItDiv {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap:10vw;
+}
+</style>
