@@ -1,8 +1,6 @@
-require('dotenv').config();
 const { MongoClient } = require('mongodb');
 
-const uri = process.env.MONGO_URI; // Load URI from environment variables
-let client; // MongoDB client instance
+let client;
 
 const connectDB = async () => {
     if (client) {
@@ -12,7 +10,7 @@ const connectDB = async () => {
 
     try {
         console.log('Establishing a new database connection...');
-        client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+        client = new MongoClient(process.env.MONGO_URI, { connectTimeoutMS: 30000 });
         await client.connect();
         console.log('Database connection established.');
         return client;
@@ -22,10 +20,11 @@ const connectDB = async () => {
     }
 };
 
-const getDB = (dbName) => {
+const getDB = () => {
     if (!client) {
         throw new Error('Database connection not established. Call connectDB first.');
     }
+    const dbName = process.env.DB_NAME || 'homesphere';
     return client.db(dbName);
 };
 
