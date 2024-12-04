@@ -27,7 +27,7 @@
             <span class="tooltip">Contact</span>
           </router-link>
         </li>
-      </div>
+      </div>  
       <div class="user-icon mt-auto p-3">
         <router-link to="/user" class="nav-link" active-class="active">
           <span class="icon">&#128100;</span>
