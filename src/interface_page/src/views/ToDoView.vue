@@ -1,25 +1,36 @@
 <template>
-  <div class="text-center mt-5">
-    <h1>ToDo-Liste</h1>
-    <p class="lead">Erstellen Sie ganz einfach ToDo's und weisen Sie Familienmitglieder zu</p>
+  <div class="todo-view">
+    <div class="page-header">
+      <h1>ToDo-Liste</h1>
+      <p class="subtitle">Erstellen Sie ganz einfach ToDo's und weisen Sie Familienmitglieder zu</p>
+    </div>
     
-    <form @submit.prevent="addTodo">
-      <input 
-        v-model="todoText" 
-        type="text" 
-        placeholder="ToDo-Titel eingeben..." 
-        class="form-control mb-3"
-      />
-      <input
-        v-model="todoDescription"
-        type="text"
-        placeholder="ToDo-Beschreibung eingeben..."
-        class="form-control mb-3"
-        />
-      <button type="submit" class="btn btn-primary">Hinzufügen</button>
-    </form>
+    <div class="card todo-form">
+      <form @submit.prevent="addTodo" class="form-content">
+        <div class="form-group">
+          <input 
+            v-model="todoText" 
+            type="text" 
+            placeholder="ToDo-Titel eingeben..." 
+            class="todo-input"
+          />
+        </div>
+        <div class="form-group">
+          <input
+            v-model="todoDescription"
+            type="text"
+            placeholder="ToDo-Beschreibung eingeben..."
+            class="todo-input"
+          />
+        </div>
+        <button type="submit" class="btn">
+          <span class="icon">✨</span>
+          Hinzufügen
+        </button>
+      </form>
+    </div>
 
-    <div class="postItDiv">
+    <div class="todo-grid">
       <ToDoItem 
         v-for="(todo, index) in todos" 
         :key="index" 
@@ -75,17 +86,83 @@ export default {
       } catch (error) {
         console.error('Fehler beim Abrufen der Daten:', error);
       }
-    },
-    mounted() {
-    //this.fetchData();
     }
   }
 };
 </script>
-<style>
-.postItDiv {
+
+<style scoped>
+.todo-view {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.subtitle {
+  color: var(--text-color);
+  opacity: 0.8;
+  font-size: 1.1em;
+}
+
+.todo-form {
+  max-width: 800px;
+  margin: 0 auto 3rem auto;
+}
+
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.todo-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 1rem;
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  transition: all 0.2s ease;
+}
+
+.todo-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.1);
+}
+
+.todo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap:10vw;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.btn {
+  align-self: flex-end;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  font-size: 1.2em;
+}
+
+@media (max-width: 768px) {
+  .todo-view {
+    padding: 1rem;
+  }
+  
+  .todo-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
