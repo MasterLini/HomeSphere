@@ -9,6 +9,7 @@
         type="text" 
         placeholder="ToDo-Titel eingeben..." 
         class="form-control mb-3"
+        required
       />
       <input
         v-model="todoDescription"
@@ -16,12 +17,17 @@
         placeholder="ToDo-Beschreibung eingeben..."
         class="form-control mb-3"
         />
+        <input
+        v-model="todoDate"
+        type="date"
+        class="form-control mb-3"
+        />
       <button type="submit" class="btn btn-primary">Hinzufügen</button>
     </form>
 
     <div class="postItDiv">
       <ToDoItem 
-        v-for="(todo, index) in todos" 
+        v-for="(todo, index) in sortTodo()" 
         :key="index" 
         :todo="todo" 
         :index="index" 
@@ -46,14 +52,20 @@ export default {
     return {
       todoText: "", 
       todoDescription: "",
+      todoDate: "",
       todos: [],
       data: ""
     };
   },
+  mounted() {
+    //this.fetchData();
+    console.log("Hii");
+    this.setMinimumDate();
+    },
   methods: {
     addTodo() {
       if (this.todoText.trim() !== "") {
-        this.todos.push({ text: this.todoText, description: this.todoDescription, completed: false });
+        this.todos.push({ text: this.todoText, description: this.todoDescription, date: this.todoDate, completed: false });
         this.todoText = ""; 
       }
       if (this.todoDescription.trim() !== "") {
@@ -67,6 +79,15 @@ export default {
     updateTodo({ index, completed }) {
       this.todos[index].completed = completed;
     },
+    setMinimumDate() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0'); 
+      const dd = String(today.getDate()).padStart(2, '0'); 
+      const currentDate = `${yyyy}-${mm}-${dd}`;
+
+      document.querySelectorAll('input[type="date"]').forEach(input => input.setAttribute('min', currentDate));      
+    },
     async fetchData() {
       try {
         const response = await axios.get(backendUrl);
@@ -76,8 +97,12 @@ export default {
         console.error('Fehler beim Abrufen der Daten:', error);
       }
     },
-    mounted() {
-    //this.fetchData();
+    sortTodo() {
+      return this.todos.slice().sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA - dateB; 
+      });
     }
   }
 };
