@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { getDB } = require('../db/connectDB');
+const { sendVerificationEmail } = require('../utils/emailService');
 
 const router = express.Router();
 
@@ -74,10 +75,56 @@ router.post('/register', async (req, res) => {
 
         const result = await db.collection('users').insertOne(user);
 
-        res.status(201).json({ message: 'User registered successfully', userId: result.insertedId });
+        // Send verification email
+        try {
+            await sendVerificationEmail(email, user.verificationToken);
+        } catch (emailError) {
+            console.error('Failed to send verification email:', emailError);
+            // Continue with registration even if email fails
+        }
+
+        res.status(201).json({ 
+            message: 'User registered successfully. Please check your email to verify your account.',
+            userId: result.insertedId 
+        });
     } catch (error) {
         console.error('Error during registration:', error);
         res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Email verification endpoint
+router.get('/verify/:token', async (req, res) => {
+    try {
+        const { token } = req.params;
+        const db = getDB(process.env.DB_NAME);
+
+        // Find user with matching token and token not expired
+        const user = await db.collection('users').findOne({
+            verificationToken: token,
+            verificationExpires: { $gt: new Date() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ 
+                message: 'Invalid or expired verification token. Please register again.' 
+            });
+        }
+
+        // Update user as verified
+        await db.collection('users').updateOne(
+            { _id: user._id },
+            { 
+                $set: { isVerified: true },
+                $unset: { verificationToken: "", verificationExpires: "" }
+            }
+        );
+
+        // Redirect to frontend with success message
+        res.redirect('/verification-success.html');
+    } catch (error) {
+        console.error('Error during email verification:', error);
+        res.status(500).json({ message: 'Server error during verification' });
     }
 });
 

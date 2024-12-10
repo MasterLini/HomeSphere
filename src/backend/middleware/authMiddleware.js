@@ -6,21 +6,26 @@ const authMiddleware = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader) {
+            console.warn('Authorization header is missing');
             return res.status(401).json({ message: 'Authorization header is missing' });
         }
 
-        const token = authHeader.split(' ')[1];
+        const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7, authHeader.length) : authHeader;
         if (!token) {
+            console.warn('Token is missing');
             return res.status(401).json({ message: 'Token is missing' });
         }
 
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
         const db = getDB();
+        const cacheKey = `user_${decoded.userId}`;
+        // Implement caching logic here (e.g., Redis)
 
         const user = await db.collection('users').findOne({ _id: new ObjectId(decoded.userId) });
 
         if (!user) {
+            console.warn(`User not found for ID: ${decoded.userId}`);
             return res.status(404).json({ message: 'User not found' });
         }
 
