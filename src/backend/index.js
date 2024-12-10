@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 
 (async () => {
     try {
-        // Connect to the database
+
         await connectDB();
         const db = getDB();
         app.use(express.static(path.join(__dirname, 'public')));
@@ -26,11 +26,10 @@ app.use(bodyParser.json());
         app.get('/protected-route', authMiddleware, (req, res) => {
             res.status(200).json({ message: `Welcome, ${req.user.username}`, user: req.user });
         });
-        // Routes
+
         app.use('/auth', authRoute);
         app.use('/docs', docRoute);
 
-        // Start the server
         app.listen(port, () => {
             console.log(`Server running at http://localhost:${port}`);
         });
