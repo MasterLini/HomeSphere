@@ -24,11 +24,13 @@
             class="todo-input"
           />
         </div>
+        <div class="form-group">
           <input
         v-model="todoDate"
         type="date"
-        class="form-control mb-3"
+        class="todo-input"
         />
+      </div>
       <button type="submit" class="btn">
           <span class="icon">✨</span>
           Hinzufügen
@@ -120,6 +122,9 @@ export default {
 </script>
 
 <style scoped>
+body {
+  overflow-x: hidden;
+}
 .todo-view {
   max-width: 1200px;
   margin: 0 auto;
@@ -167,9 +172,12 @@ export default {
 
 .todo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(3,auto); 
   gap: 2rem;
-  padding: 1rem;
+  margin: 0;
+  padding: 0;
+  align-items: start; 
+  justify-items: start; 
 }
 
 .btn {

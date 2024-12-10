@@ -67,41 +67,55 @@
 
 .postIt {
   background-image: url('../assets/postit.svg');
-  height: 40vh; /* Fixe Höhe */
-  width: 40vw; /* Fixe Breite */
+  height: 40vh; 
+  width: 20vw; 
+  padding: 0;
+  margin: 0;
+  overflow: hidden; 
+  box-sizing: border-box; 
   background-repeat: no-repeat;
-  background-size: contain; /* Hintergrundbild bleibt proportional */
-  background-position: center; /* Bild wird zentriert */
+  background-size: contain; 
+  background-position: center; 
   display: flex;
-  justify-content: center; /* Zentriert den Inhalt horizontal */
-  align-items: center; /* Zentriert den Inhalt vertikal */
+  justify-content: center; 
+  align-items: center; 
 }
 
 .content {
-  width: 80%; /* Begrenzt die Breite des Inhalts */
-  text-align: center; /* Zentriert den Text */
-  max-width: 38vw;
+  text-align: center; 
+  padding: 0;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .content span:nth-of-type(1) {
-  font-family: "Yuji Mai", serif; /* Spezielle Schriftart nur für die Überschrift */
-  font-size: 1.5rem; /* Größere Schrift für die Überschrift */
-  display: block;
-  margin-bottom: 0.5rem; /* Abstand zum nächsten Element */
+  font-family:Arial, Helvetica, sans-serif;
+  font-style: italic; 
+  font-size: 1.5rem; 
+  display: inline-block;
+  margin-bottom: 0.5rem; 
 }
 
 .content span:nth-of-type(2) {
-  font-size: 1rem; /* Standardgröße für Beschreibung */
-  display: block;
-  margin-bottom: 1rem; /* Abstand zum Button */
+  font-size: 1rem; 
+  display: inline-block;
+  margin-bottom: 1rem;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .content input[type="checkbox"] {
-  margin-right: 0.5rem; /* Abstand rechts vom Checkbox */
+  margin-right: 0.5rem; 
+}
+
+.content input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: none;
+  box-shadow: none;
 }
 
 .content button {
-  margin-top: 1rem; /* Abstand oberhalb des Buttons */
+  margin-top: 1rem; 
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
   border: none;
@@ -112,7 +126,7 @@
 }
 
 .content button:hover {
-  background-color: #c0392b; /* Farbe bei Hover ändern */
+  background-color: #c0392b; 
 }
 
   </style>
