@@ -2,6 +2,7 @@ const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 dotenv.config();
 
+// Create a transporter using environment variables
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
@@ -11,10 +12,12 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS
     },
     tls: {
+        // do not fail on invalid certs
         rejectUnauthorized: false
     }
 });
 
+// Verify transporter configuration
 transporter.verify(function(error, success) {
     if (error) {
         console.log('Transporter verification error:', error);
@@ -23,6 +26,7 @@ transporter.verify(function(error, success) {
     }
 });
 
+// Send verification email
 const sendVerificationEmail = async (email, token) => {
     const verificationUrl = `http://localhost:3000/auth/verify/${token}`;
     
