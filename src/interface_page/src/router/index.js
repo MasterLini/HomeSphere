@@ -4,6 +4,7 @@ import UserView from '../views/UserView.vue'
 import AboutView from "../views/AboutView.vue"
 import ToDoView from "../views/ToDoView.vue"
 import AuthView from "../views/AuthView.vue"
+import ShoppingListView from '@/views/ShoppingListView.vue'
 
 const routes = [
   {
@@ -34,6 +35,11 @@ const routes = [
     path: '/todo',
     name: 'todo',
     component: ToDoView
+  },
+  {
+    path: '/shoppinglist',
+    name: 'shoppinglist',
+    component: ShoppingListView
   }
 ]
 
