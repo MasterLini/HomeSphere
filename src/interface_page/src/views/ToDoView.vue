@@ -12,6 +12,7 @@
             v-model="todoText" 
             type="text" 
             placeholder="ToDo-Titel eingeben..." 
+            maxlength="40"
             class="todo-input"
             required
       />
@@ -21,6 +22,7 @@
             v-model="todoDescription"
             type="text"
             placeholder="ToDo-Beschreibung eingeben..."
+            maxlength="160"
             class="todo-input"
           />
         </div>
