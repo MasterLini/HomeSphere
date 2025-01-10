@@ -30,28 +30,49 @@
         </button>
       </form>
     </div>  
+    <ShoppingListItem 
+        v-for="(item, index) in data" 
+        :key="index" 
+        :list="item" 
+        :index="index" 
+        @remove="removeItem"
+        @update="updateTodo"
+      />
     </div>
 </template>
 
 <script>
+import ShoppingListItem from '@/components/ShoppingListItem.vue';
 import axios from 'axios';
 const backendUrl = `http://${process.env.VUE_APP_SERVER_IP}:${process.env.VUE_APP_SERVER_PORT}`;
 
 export default {
   name: "shoppinglist",
   components: {
+    ShoppingListItem
   },
   data() {
     return {
       productName: "", 
       quantity: 1,
-      data: ""
+      data: []
     };
   },
   mounted() {
     //this.fetchData();
     },
   methods: {
+    addItem() {
+      if(this.productName.trim() !== "") {
+        this.data.push({productName: this.productName, quantity: this.quantity});
+        this.productName = "";
+        this.quantity = 1;
+      }
+      console.log(this.data)
+    },
+    removeItem(index) {
+      this.data.splice(index, 1);
+    },
     selectElements() {
       const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     },
