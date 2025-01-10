@@ -8,6 +8,10 @@ const { connectDB, getDB } = require('./db/connectDB');
 const authMiddleware = require('./middleware/authMiddleware');
 const authRoute = require('./router/AuthRoute');
 const docRoute = require('./router/DocRoute');
+const listRoute = require('./router/ListRoute');
+
+
+console.log(authRoute, docRoute, listRoute);
 
 const app = express();
 const port = 3000;
@@ -28,7 +32,9 @@ app.use(bodyParser.json());
         });
 
         app.use('/auth', authRoute);
+
         app.use('/docs', docRoute);
+        app.use('/lists', listRoute);
 
         app.listen(port, () => {
             console.log(`Server running at http://localhost:${port}`);
