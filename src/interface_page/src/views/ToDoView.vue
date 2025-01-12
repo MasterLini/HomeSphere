@@ -69,7 +69,7 @@ export default {
       todoDescription: "",
       todoDate: "",
       todos: [],
-      data: ""
+      data: []
     };
   },
   mounted() {
@@ -105,7 +105,7 @@ export default {
     },
     async fetchData() {
       try {
-        const response = await axios.get(backendUrl);
+        const response = await axios.get(backendUrl + "/lists/");
         this.data = response.data;
         console.log(this.data)
       } catch (error) {

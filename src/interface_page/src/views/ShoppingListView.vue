@@ -30,14 +30,27 @@
         </button>
       </form>
     </div>  
-    <ShoppingListItem 
-        v-for="(item, index) in data" 
-        :key="index" 
-        :list="item" 
-        :index="index" 
-        @remove="removeItem"
-        @update="updateTodo"
-      />
+    <div class="shoppinglist-table">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Produkt</th>
+            <th>Menge</th>
+            <th>Aktionen</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in data" :key="index">
+            <td>{{ item.productName }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>
+              
+              <button @click="removeItem(index)" class="btn btn-danger">Löschen</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     </div>
 </template>
 
@@ -128,6 +141,21 @@ export default {
 
 .icon {
   font-size: 1.2em;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+.table th, .table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+.table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
 }
 
 </style>
