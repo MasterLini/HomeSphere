@@ -14,7 +14,7 @@
             maxlength="40"
             class="list-input"
             required
-      />
+          />
         </div>
         <div class="form-group">
           <input
@@ -24,7 +24,7 @@
             class="list-input"
           />
         </div>
-      <button type="submit" class="btn">
+        <button type="submit" class="btn">
           <span class="icon">✨</span>
           Hinzufügen
         </button>
@@ -40,18 +40,32 @@
           </tr>
         </thead>
         <tbody>
+          <tr>
+            <th>Produkt</th>
+            <th>Menge</th>
+            <th>Aktionen</th>
+          </tr>
           <tr v-for="(item, index) in data" :key="index">
-            <td>{{ item.productName }}</td>
-            <td>{{ item.quantity }}</td>
+            <td @click="activateEditMode(item, 'productName')" v-show="!(editField === 'productName' && item.inEditMode)">
+              {{ item.productName }}
+            </td>
+            <td v-show="editField === 'productName' && item.inEditMode">
+              <input type="text" v-model="item.productName" v-bind:placeholder="item.productName">
+            </td>
+            <td @click="activateEditMode(item, 'quantity')" v-show="!(editField === 'quantity' && item.inEditMode)">
+              {{ item.quantity }}
+            </td>
+            <td v-show="editField === 'quantity' && item.inEditMode">
+              <input type="text" v-model="item.quantity" v-bind:placeholder="item.quantity">
+            </td>
             <td>
-              
               <button @click="removeItem(index)" class="btn btn-danger">Löschen</button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    </div>
+  </div>
 </template>
 
 <script>
@@ -68,32 +82,61 @@ export default {
     return {
       productName: "", 
       quantity: 1,
-      data: []
+      data: [],
+      editField: ""
     };
   },
   mounted() {
-    //this.fetchData();
-    },
+    // Event listener für Klicks auf das Dokument hinzufügen
+    document.addEventListener('click', this.handleClickOutside);
+  },
+  beforeDestroy() {
+    // Event listener entfernen, wenn die Komponente zerstört wird
+    document.removeEventListener('click', this.handleClickOutside);
+  },
   methods: {
     addItem() {
-      if(this.productName.trim() !== "") {
-        this.data.push({productName: this.productName, quantity: this.quantity});
+      if (this.productName.trim() !== "") {
+        this.data.push({ productName: this.productName, quantity: this.quantity, inEditMode: false });
         this.productName = "";
         this.quantity = 1;
       }
-      console.log(this.data)
     },
     removeItem(index) {
       this.data.splice(index, 1);
     },
-    selectElements() {
-      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    activateEditMode(item, field) {
+      this.data.forEach((entry) => {
+        entry.inEditMode = false;
+      });
+
+      item.inEditMode = true;
+      this.editField = field;
+    },
+    deactivateEditMode() {
+      this.data.forEach((entry) => {
+        entry.inEditMode = false;
+      });
+      this.editField = "";
+    },
+    handleClickOutside(event) {
+      const editFields = document.querySelectorAll('.list-input, td');
+      let clickedInside = false;
+
+      editFields.forEach(field => {
+        if (field.contains(event.target)) {
+          clickedInside = true;
+        }
+      });
+
+      if (!clickedInside) {
+        this.deactivateEditMode();
+      }
     },
     async fetchData() {
       try {
         const response = await axios.get(backendUrl);
         this.data = response.data;
-        console.log(this.data)
       } catch (error) {
         console.error('Fehler beim Abrufen der Daten:', error);
       }
@@ -103,7 +146,6 @@ export default {
 </script>
 
 <style scoped>
-
 .page-header {
   text-align: center;
   margin-bottom: 2rem;
@@ -147,6 +189,7 @@ export default {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
+  border-spacing: 0;
 }
 .table th, .table td {
   border: 1px solid #ddd;
@@ -157,5 +200,4 @@ export default {
   background-color: #f4f4f4;
   font-weight: bold;
 }
-
 </style>
