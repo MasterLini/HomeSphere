@@ -21,8 +21,20 @@
             v-model="quantity"
             type="number"
             placeholder="Menge eingeben..."
+            min="1"
+            max="9999"
+            step="0.01"
             class="list-input"
           />
+        </div>
+        <div class="form-group">
+          <select 
+            v-model="unit"            
+            class="list-input">
+            <option value="amount">Stück (St.)</option>
+            <option value="litre">Liter (L)</option>
+            <option value="kilogram">Kilogramm (kg)</option>
+          </select>
         </div>
         <button type="submit" class="btn">
           <span class="icon">✨</span>
@@ -30,19 +42,13 @@
         </button>
       </form>
     </div>  
-    <div class="shoppinglist-table">
+    <div class="shoppinglist-table" v-show="data.length > 0">
       <table class="table">
-        <thead>
-          <tr>
-            <th>Produkt</th>
-            <th>Menge</th>
-            <th>Aktionen</th>
-          </tr>
-        </thead>
         <tbody>
           <tr>
             <th>Produkt</th>
             <th>Menge</th>
+            <th>Einheit</th>
             <th>Aktionen</th>
           </tr>
           <tr v-for="(item, index) in data" :key="index">
@@ -56,8 +62,19 @@
               {{ item.quantity }}
             </td>
             <td v-show="editField === 'quantity' && item.inEditMode">
-              <input type="text" v-model="item.quantity" v-bind:placeholder="item.quantity">
+              <input type="number" max="9999" min="1" step="0.01" v-model="item.quantity" v-bind:placeholder="item.quantity">
             </td>
+            <td @click="activateEditMode(item, 'unit')" v-show="!(editField === 'unit' && item.inEditMode)">
+              {{ unitOptions[item.unit] }}
+            </td>
+            <td v-show="editField === 'unit' && item.inEditMode">
+              <select v-model="item.unit" class="list-input">
+                <option v-for="(label, value) in unitOptions" :key="value" :value="value">
+                  {{ label }}
+                </option>
+              </select>
+            </td>
+
             <td>
               <button @click="removeItem(index)" class="btn btn-danger">Löschen</button>
             </td>
@@ -82,8 +99,14 @@ export default {
     return {
       productName: "", 
       quantity: 1,
+      unit: "amount",
       data: [],
-      editField: ""
+      editField: "",
+      unitOptions: {
+      amount: "Stück (St.)",
+      litre: "Liter (L)",
+      kilogram: "Kilogramm (kg)"
+    }
     };
   },
   mounted() {
@@ -97,9 +120,11 @@ export default {
   methods: {
     addItem() {
       if (this.productName.trim() !== "") {
-        this.data.push({ productName: this.productName, quantity: this.quantity, inEditMode: false });
+        this.data.push({ productName: this.productName, quantity: this.quantity, unit: this.unit, inEditMode: false });
         this.productName = "";
+        this.unit = "amount";
         this.quantity = 1;
+        console.log(this.data)
       }
     },
     removeItem(index) {
@@ -131,6 +156,7 @@ export default {
 
       if (!clickedInside) {
         this.deactivateEditMode();
+        console.log(this.data)
       }
     },
     async fetchData() {
@@ -187,6 +213,7 @@ export default {
 
 .table {
   width: 100%;
+  display: table;
   border-collapse: collapse;
   margin-top: 1rem;
   border-spacing: 0;
