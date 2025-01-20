@@ -8,7 +8,7 @@
           class="me-2"
           @change="toggleCompleted"
         />
-        <span :class="{ 'completed': todo.completed}">
+        <span contenteditable="true" @input="updateTodo" :class="{ 'completed': todo.completed}">
           {{ todo.text }}
         </span>
         <br>
@@ -44,7 +44,11 @@
         this.$emit("remove", this.index);
       },
       toggleCompleted() {
-        this.$emit("update", { index: this.index, completed: this.todo.completed });
+        this.$emit("check", { index: this.index, completed: this.todo.completed });
+      },
+      updateTodo(event) {
+        const updatedText = event.target.textContent.trim();
+        this.$emit("update", {index: this.index, newText: updatedText});
       },
       formatDate(date) {
         if (date.trim() !== "")
@@ -135,5 +139,8 @@
   background-color: #c0392b; 
 }
 
+span {
+  border: none;
+}
   </style>
   

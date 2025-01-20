@@ -47,6 +47,7 @@
         :todo="todo" 
         :index="index" 
         @remove="removeTodo"
+        @check="checkTodo"
         @update="updateTodo"
       />
     </div>
@@ -91,8 +92,12 @@ export default {
     removeTodo(index) {
       this.todos.splice(index, 1);
     },
-    updateTodo({ index, completed }) {
+    checkTodo({ index, completed }) {
       this.todos[index].completed = completed;
+    },
+    updateTodo({index, newText}) {
+      this.todos[index].text = newText;
+      console.log(this.todos);
     },
     setMinimumDate() {
       const today = new Date();
