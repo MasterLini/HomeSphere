@@ -5,11 +5,11 @@
         <span class="label-icon">📧</span>
         Email address
       </label>
-      <input 
-        type="email" 
-        v-model="loginForm.email" 
-        placeholder="Enter your email" 
-        required
+      <input
+          type="email"
+          v-model="loginForm.email"
+          placeholder="Enter your email"
+          required
       >
     </div>
     <div class="form-group">
@@ -18,17 +18,17 @@
         Password
       </label>
       <div class="password-input">
-        <input 
-          :type="showPassword ? 'text' : 'password'"
-          v-model="loginForm.password" 
-          placeholder="Enter your password" 
-          required
+        <input
+            :type="showPassword ? 'text' : 'password'"
+            v-model="loginForm.password"
+            placeholder="Enter your password"
+            required
         >
-        <button 
-          type="button" 
-          class="password-toggle" 
-          @click="showPassword = !showPassword"
-          :title="showPassword ? 'Hide password' : 'Show password'"
+        <button
+            type="button"
+            class="password-toggle"
+            @click="showPassword = !showPassword"
+            :title="showPassword ? 'Hide password' : 'Show password'"
         >
           <span class="mdi" :class="showPassword ? 'mdi-eye-off' : 'mdi-eye'"></span>
         </button>
@@ -45,6 +45,9 @@
 </template>
 
 <script>
+import axios from 'axios';
+const backendUrl = `http://${process.env.VUE_APP_SERVER_IP}:${process.env.VUE_APP_SERVER_PORT}`;
+
 export default {
   name: 'LoginForm',
   data() {
@@ -57,8 +60,16 @@ export default {
     }
   },
   methods: {
-    handleLogin() {
-      this.$emit('submit', this.loginForm)
+    async handleLogin() {
+      try {
+        const response = await axios.post(`${backendUrl}/auth/login`, this.loginForm);
+        const { token } = response.data;
+        localStorage.setItem('token', token);
+        this.$router.push({ name: 'home' });
+      } catch (error) {
+        console.error('Login failed:', error);
+        alert('Login failed. Please check your credentials and try again.');
+      }
     }
   }
 }

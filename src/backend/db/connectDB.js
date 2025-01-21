@@ -11,37 +11,46 @@ const configSchema = Joi.object({
     DB_NAME: Joi.string().required(),
 }).unknown();
 
-const { error } = configSchema.validate(process.env);
+const { value: config, error } = configSchema.validate(process.env, { abortEarly: false });
 if (error) {
-    console.error('Config validation error:', error.message);
+    console.error('Config validation error:', error.details.map(err => err.message).join(', '));
     process.exit(1);
 }
+
+const mongoOptions = {
+    connectTimeoutMS: 30000,
+    useUnifiedTopology: true,
+};
+
+const connectWithRetry = async (retries = 5, delay = 3000) => {
+    for (let i = 0; i < retries; i++) {
+        try {
+            console.log('Trying to establish a database connection...');
+            client = new MongoClient(config.MONGO_URI, mongoOptions);
+            await client.connect();
+            console.log('Database connection established.');
+            return client;
+        } catch (error) {
+            console.error(`Database connection attempt ${i + 1} failed: ${error.message}`);
+            if (i === retries - 1) throw error;
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    }
+};
 
 const connectDB = async () => {
     if (client) {
         console.log('Reusing existing database connection...');
         return client;
     }
-
-    try {
-        console.log('Establishing a new database connection...');
-        client = new MongoClient(process.env.MONGO_URI, { connectTimeoutMS: 30000, useUnifiedTopology: true });
-        await client.connect();
-        console.log('Database connection established.');
-        return client;
-    } catch (error) {
-        console.error('Failed to connect to the database:', error.message);
-        // Implement retry mechanism or notify system here
-        process.exit(1);
-    }
+    return await connectWithRetry();
 };
 
 const getDB = () => {
     if (!client) {
         throw new Error('Database connection not established. Call connectDB first.');
     }
-    const dbName = process.env.DB_NAME;
-    return client.db(dbName);
+    return client.db(config.DB_NAME);
 };
 
 const disconnectDB = async () => {
@@ -50,5 +59,21 @@ const disconnectDB = async () => {
         console.log('Database connection closed.');
     }
 };
+
+const setupShutdownHook = () => {
+    process.on('SIGINT', async () => {
+        console.log('SIGINT signal received: closing database connection...');
+        await disconnectDB();
+        process.exit(0);
+    });
+
+    process.on('SIGTERM', async () => {
+        console.log('SIGTERM signal received: closing database connection...');
+        await disconnectDB();
+        process.exit(0);
+    });
+};
+
+setupShutdownHook();
 
 module.exports = { connectDB, getDB, disconnectDB };
