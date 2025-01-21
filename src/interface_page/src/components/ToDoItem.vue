@@ -1,6 +1,6 @@
 <template>
     
-      <div class="postIt">
+      <div class="postIt" :style="{ backgroundImage: 'url(' + randomSvg + ')' }">
         <div class="content">
         <input 
           type="checkbox" 
@@ -8,6 +8,7 @@
           class="me-2"
           @change="toggleCompleted"
         />
+        <br>
         <span contenteditable="true" @input="updateTodo" :class="{ 'completed': todo.completed}">
           {{ todo.text }}
         </span>
@@ -20,13 +21,14 @@
           {{ formatDate(todo.date) }}
         </span>
         <br>
-      <button class="btn btn-danger btn-sm" @click="remove">Löschen</button>
+      <button class="btn btn-danger btn-sm" @click="remove">&#128465;</button>
     </div>
     </div>
     
   </template>
   
   <script>
+
   export default {
     name: "ToDoItem",
     props: {
@@ -38,6 +40,19 @@
         type: Number,
         required: true
       }
+    },
+    data() {
+      return {
+        svgVariants: [
+        '/postit-pink.svg',
+        '/postit-yellow.svg',
+        '/postit-red.svg'
+      ],
+      randomSvg: ''
+    }
+    },
+    mounted() {
+      this.randomSvg = this.svgVariants[Math.floor(Math.random() * this.svgVariants.length)];
     },
     methods: {
       remove() {
@@ -70,7 +85,7 @@
 }
 
 .postIt {
-    background-image: url('../assets/postit.svg');
+    /*background-image: url('../assets/postit.svg');*/
     height: 40vh;
     width: 20vw;
     padding: 10px;
@@ -104,8 +119,11 @@
     font-family: Arial, Helvetica, sans-serif;
     font-style: italic;
     font-size: 1.5rem;
+    max-height: 3rem;
+    overflow-y: hidden;
     display: inline-block;
     margin-bottom: 0.5rem;
+    line-height: 1.5rem;
 }
 
 .content span:nth-of-type(2) {
@@ -127,7 +145,9 @@
 .content button {
   margin-top: 1rem; 
   padding: 0.5rem 1rem;
-  font-size: 0.9rem;
+  height: 2.5rem;
+  width: 2.5rem;
+  font-size: 1.5rem;
   border: none;
   background-color: #e74c3c;
   color: white;
