@@ -5,6 +5,7 @@ import AboutView from "../views/AboutView.vue"
 import ToDoView from "../views/ToDoView.vue"
 import AuthView from "../views/AuthView.vue"
 import ShoppingListView from '@/views/ShoppingListView.vue'
+import { isAuthenticated } from './auth' // Import the isAuthenticated function
 
 const routes = [
   {
@@ -19,33 +20,50 @@ const routes = [
   {
     path: '/home',
     name: 'home',
-    component: HomeView
+    component: HomeView,
+    meta: { requiresAuth: true } // Add meta field for authentication
   },
   {
     path: '/about',
     name: 'about',
-    component: AboutView
+    component: AboutView,
+    meta: { requiresAuth: true } // Add meta field for authentication
   },
   {
     path: '/user',
     name: 'user',
-    component: UserView
+    component: UserView,
+    meta: { requiresAuth: true } // Add meta field for authentication
   },
   {
     path: '/todo',
     name: 'todo',
-    component: ToDoView
+    component: ToDoView,
+    meta: { requiresAuth: true } // Add meta field for authentication
   },
   {
     path: '/shoppinglist',
     name: 'shoppinglist',
-    component: ShoppingListView
+    component: ShoppingListView,
+    meta: { requiresAuth: true } // Add meta field for authentication
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!isAuthenticated()) {
+      next({ name: 'auth' });
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
 })
 
 export default router

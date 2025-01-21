@@ -3,16 +3,16 @@
     <div class="auth-card">
       <div class="card-content">
         <h1 class="title">✨ Join Us!</h1>
-        
+
         <div class="tabs">
-          <button 
-            :class="['tab-btn', { active: isLogin }]" 
+          <button
+            :class="['tab-btn', { active: isLogin }]"
             @click="isLogin = true"
           >
             Sign In
           </button>
-          <button 
-            :class="['tab-btn', { active: !isLogin }]" 
+          <button
+            :class="['tab-btn', { active: !isLogin }]"
             @click="isLogin = false"
           >
             Sign Up
@@ -34,6 +34,11 @@
           </transition>
         </div>
       </div>
+      <transition name="fade">
+        <div v-if="showBanner" class="alert-banner">
+          📧 Look in your email, a verification email has been sent to this email.
+        </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -50,7 +55,8 @@ export default {
   },
   data() {
     return {
-      isLogin: false
+      isLogin: false,
+      showBanner: false
     }
   },
   methods: {
@@ -59,6 +65,10 @@ export default {
     },
     handleRegister(registerData) {
       console.log('Register:', registerData)
+      this.showBanner = true;
+      setTimeout(() => {
+        this.showBanner = false;
+      }, 5000); // Hide banner after 5 seconds
     }
   }
 }
@@ -72,6 +82,7 @@ export default {
   align-items: center;
   background-color: #f0f9f6;
   padding: 20px;
+  position: relative;
 }
 
 .auth-card {
@@ -81,6 +92,7 @@ export default {
   width: 100%;
   max-width: 400px;
   overflow: hidden;
+  position: relative;
 }
 
 .card-content {
@@ -129,11 +141,26 @@ export default {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease;
+  transition: opacity 0.5s ease;
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.alert-banner {
+  background-color: #e6fffa;
+  color: #2c7a7b;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1em;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  left: 0;
 }
 </style>

@@ -5,11 +5,11 @@
         <span class="label-icon">👤</span>
         Username
       </label>
-      <input 
-        type="text" 
-        v-model="registerForm.username" 
-        placeholder="Choose a username" 
-        required
+      <input
+          type="text"
+          v-model="registerForm.username"
+          placeholder="Choose a username"
+          required
       >
     </div>
     <div class="form-group">
@@ -17,11 +17,11 @@
         <span class="label-icon">📧</span>
         Email address
       </label>
-      <input 
-        type="email" 
-        v-model="registerForm.email" 
-        placeholder="Enter your email" 
-        required
+      <input
+          type="email"
+          v-model="registerForm.email"
+          placeholder="Enter your email"
+          required
       >
     </div>
     <div class="form-group">
@@ -30,17 +30,17 @@
         Password
       </label>
       <div class="password-input">
-        <input 
-          :type="showPassword ? 'text' : 'password'"
-          v-model="registerForm.password" 
-          placeholder="Create a password" 
-          required
+        <input
+            :type="showPassword ? 'text' : 'password'"
+            v-model="registerForm.password"
+            placeholder="Create a password"
+            required
         >
-        <button 
-          type="button" 
-          class="password-toggle" 
-          @click="showPassword = !showPassword"
-          :title="showPassword ? 'Hide password' : 'Show password'"
+        <button
+            type="button"
+            class="password-toggle"
+            @click="showPassword = !showPassword"
+            :title="showPassword ? 'Hide password' : 'Show password'"
         >
           <span class="mdi" :class="showPassword ? 'mdi-eye-off' : 'mdi-eye'"></span>
         </button>
@@ -52,17 +52,17 @@
         Confirm Password
       </label>
       <div class="password-input">
-        <input 
-          :type="showPassword ? 'text' : 'password'"
-          v-model="registerForm.confirmPassword" 
-          placeholder="Confirm your password" 
-          required
+        <input
+            :type="showPassword ? 'text' : 'password'"
+            v-model="registerForm.confirmPassword"
+            placeholder="Confirm your password"
+            required
         >
-        <button 
-          type="button" 
-          class="password-toggle" 
-          @click="showPassword = !showPassword"
-          :title="showPassword ? 'Hide password' : 'Show password'"
+        <button
+            type="button"
+            class="password-toggle"
+            @click="showPassword = !showPassword"
+            :title="showPassword ? 'Hide password' : 'Show password'"
         >
           <span class="mdi" :class="showPassword ? 'mdi-eye-off' : 'mdi-eye'"></span>
         </button>
@@ -79,6 +79,10 @@
 </template>
 
 <script>
+import axios from 'axios';
+const backendUrl = `http://${process.env.VUE_APP_SERVER_IP}:${process.env.VUE_APP_SERVER_PORT}`;
+
+
 export default {
   name: 'RegisterForm',
   data() {
@@ -93,8 +97,17 @@ export default {
     }
   },
   methods: {
-    handleRegister() {
-      this.$emit('submit', this.registerForm)
+    async handleRegister() {
+      if (this.registerForm.password !== this.registerForm.confirmPassword) {
+        return;
+      }
+
+      try {
+        const response = await axios.post(`${backendUrl}/auth/register`, this.registerForm);
+        this.$emit('submit', this.registerForm);
+      } catch (error) {
+        console.error('Registration error:', error);
+      }
     }
   }
 }

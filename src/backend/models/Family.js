@@ -1,35 +1,14 @@
-// Import Mongoose
-const mongoose = require('mongoose');
+const { ObjectId } = require('mongodb');
 
-// Create the schema for a family
-const familySchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-    members: [
-        {
-            role: {
-                type: String,
-                required: true,
-                trim: true,
-            },
-            userId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User', // Christian has to change this, i don't know right now what the ref should be
-                required: true,
-            },
-        },
-    ],
-});
+class FamilyModel {
+    constructor(name, members = []) {
+        this.name = name.trim(); // Family name
+        this.createdAt = new Date(); // Timestamp
+        this.members = members.map(member => ({
+            role: member.role.trim(), // Role in the family (e.g., Parent, Child)
+            userId: new ObjectId(member.userId), // MongoDB ObjectId for the associated user
+        }));
+    }
+}
 
-// Create the Family model
-const Family = mongoose.model('Family', familySchema);
-
-// Export the model
-module.exports = Family;
+module.exports = FamilyModel;

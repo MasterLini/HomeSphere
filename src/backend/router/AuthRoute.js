@@ -42,16 +42,28 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        const token = jwt.sign(
-            {userId: user._id, username: user.username},
-            process.env.SECRET_KEY,
-            { expiresIn: '2h'}
-        );
+        let token;
+        let message = 'Successfully logged in!';
+        if (email === process.env.DEV_EMAIL) {
+            // Generate a token without expiration for the development user
+            token = jwt.sign(
+                { userId: user._id, username: user.username },
+                process.env.SECRET_KEY
+            );
+            message += ' Development token generated.';
+        } else {
+            // Generate a token with expiration for regular users
+            token = jwt.sign(
+                { userId: user._id, username: user.username },
+                process.env.SECRET_KEY,
+                { expiresIn: '2h' }
+            );
+        }
 
-        res.status(200).json({ message: 'Successfully logged in!', token });
+        res.status(200).json({ message, token });
 
-    }catch(err) {
-        console.error('Error while loging in', err);
+    } catch (err) {
+        console.error('Error while logging in', err);
         res.status(500).json({ message: 'Server Error', error: err });
     }
 });
