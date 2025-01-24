@@ -38,6 +38,9 @@
           Hinzufügen
         </button>
       </form>
+      <button @click="toggleSort" class="btn btn-primary">
+        <i :class="sortIcon"></i>
+      </button>
     </div>
 
     <div class="todo-grid">
@@ -69,8 +72,14 @@ export default {
       todoDescription: "",
       todoDate: "",
       todos: [],
+      isAscending: true,
       data: []
     };
+  },
+  computed: {
+    sortIcon() {
+      return this.isAscending ? "bi bi-sort-up" : "bi bi-sort-down";
+    },
   },
   mounted() {
     //this.fetchData();
@@ -116,9 +125,12 @@ export default {
       return this.todos.slice().sort((a, b) => {
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
-        return dateA - dateB; 
+        return this.isAscending ? dateA - dateB : dateB - dateA;
       });
-    }
+    },
+    toggleSort() {
+      this.isAscending = !this.isAscending;
+    },
   }
 };
 </script>

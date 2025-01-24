@@ -1,6 +1,6 @@
 <template>
     
-      <div class="postIt" :style="{ backgroundImage: 'url(' + randomSvg + ')' }">
+      <div class="postIt" :style="{ backgroundImage: todo.completed ? 'url(/postit-green.svg)' : 'url(' + randomSvg + ')' }">
         <div class="content">
         <input 
           type="checkbox" 
