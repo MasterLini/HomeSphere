@@ -9,6 +9,7 @@ const authRoute = require('./router/AuthRoute');
 const docRoute = require('./router/DocRoute');
 const listRoute = require('./router/ListRoute');
 const familyRoute = require('./router/FamilyRoute');
+const userRoute = require('./router/UserRoute');
 const { logRoutes } = require('./utils/routeLogger');
 const cors = require('cors');
 
@@ -33,6 +34,7 @@ const registerRoutes = (app) => {
     app.use('/docs', docRoute);
     app.use('/lists', listRoute);
     app.use('/family', familyRoute);
+    app.use('/users', userRoute);
 
     app.get('/protected-route', authMiddleware, (req, res) => {
         res.status(200).json({ message: `Welcome, ${req.user.username}`, user: req.user });
