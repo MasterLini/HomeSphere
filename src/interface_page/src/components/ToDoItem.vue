@@ -84,6 +84,10 @@
   text-decoration: line-through;
 }
 
+[contenteditable]:focus {
+  outline: none;
+}
+
 .postIt {
     /*background-image: url('../assets/postit.svg');*/
     height: 40vh;

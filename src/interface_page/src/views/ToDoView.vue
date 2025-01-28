@@ -59,8 +59,11 @@
 <script>
 import ToDoItem from "../components/ToDoItem.vue";
 import axios from 'axios';
-const backendUrl = `http://${process.env.VUE_APP_SERVER_IP}:${process.env.VUE_APP_SERVER_PORT}`;
 
+//const backendUrl = `http://${process.env.VUE_APP_SERVER_IP}:${process.env.VUE_APP_SERVER_PORT}`;
+const backendUrl = `http://localhost:3000`;
+console.log(process.env);
+console.log(backendUrl)
 export default {
   name: "todo",
   components: {
@@ -82,21 +85,33 @@ export default {
     },
   },
   mounted() {
-    //this.fetchData();
-    console.log("Hii");
+    this.fetchData();
     this.setMinimumDate();
     },
   methods: {
-    addTodo() {
-      if (this.todoText.trim() !== "") {
-        this.todos.push({ text: this.todoText, description: this.todoDescription, date: this.todoDate, completed: false });
-        this.todoText = ""; 
-      }
-      if (this.todoDescription.trim() !== "") {
-        this.todoDescription = "";
-      }
-      console.log(this.todos);
-    },
+  addTodo() {
+    if (this.todoText.trim() !== "") {
+      const newTodo = {
+        text: this.todoText,
+        description: this.todoDescription || "", // Beschreibung kann leer sein
+        date: this.todoDate || null, // Datum ist optional
+        completed: false,
+      };
+
+      axios.post(backendUrl + "/lists/", newTodo)
+        .then((response) => {
+          this.todos.push(response.data);
+          console.log("ToDo erfolgreich hinzugefügt:", response.data);
+        })
+        .catch((error) => {
+          console.error("Fehler beim Hinzufügen des ToDos:", error);
+        });
+
+      this.todoText = "";
+      this.todoDescription = "";
+      this.todoDate = "";
+  }
+},
     removeTodo(index) {
       this.todos.splice(index, 1);
     },
@@ -139,6 +154,7 @@ export default {
 body {
   overflow-x: hidden;
 }
+
 .todo-view {
   max-width: 1200px;
   margin: 0 auto;

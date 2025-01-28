@@ -7,7 +7,7 @@
             }
 
             .cls-1, .cls-2 {
-            fill:rgb(255, 97, 139);
+            fill:rgb(247, 70, 118);
             }
 
             .cls-1, .cls-2, .cls-3 {
@@ -19,7 +19,7 @@
             }
 
             .cls-3 {
-            fill: #9c9c5c;
+            fill:rgb(182, 33, 33);
             filter: url(#drop-shadow-3);
             }
         </style>
