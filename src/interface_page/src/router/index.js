@@ -27,25 +27,25 @@ const routes = [
     path: '/about',
     name: 'about',
     component: AboutView,
-    meta: { requiresAuth: true } // Add meta field for authentication
+    meta: { requiresAuth: false } // Add meta field for authentication
   },
   {
     path: '/user',
     name: 'user',
     component: UserView,
-    meta: { requiresAuth: true } // Add meta field for authentication
+    meta: { requiresAuth: false } // Add meta field for authentication
   },
   {
     path: '/todo',
     name: 'todo',
     component: ToDoView,
-    meta: { requiresAuth: true } // Add meta field for authentication
+    meta: { requiresAuth: false } // Add meta field for authentication
   },
   {
     path: '/shoppinglist',
     name: 'shoppinglist',
     component: ShoppingListView,
-    meta: { requiresAuth: true } // Add meta field for authentication
+    meta: { requiresAuth: false } // Add meta field for authentication
   }
 ]
 

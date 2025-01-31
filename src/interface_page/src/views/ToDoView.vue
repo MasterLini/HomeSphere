@@ -91,25 +91,33 @@ export default {
   methods: {
   addTodo() {
     if (this.todoText.trim() !== "") {
-      const newTodo = {
-        text: this.todoText,
-        description: this.todoDescription || "", // Beschreibung kann leer sein
-        date: this.todoDate || null, // Datum ist optional
-        completed: false,
-      };
+    const newTodo = {
+      id: new Date().getTime().toString(), // Temporäre ID (MongoDB ersetzt sie später)
+      text: this.todoText,
+      description: this.todoDescription || "", // Optional
+      date: this.todoDate || null, // Optional
+      responsibilities: null, // Wird vom Backend gefüllt
+    };
 
-      axios.post(backendUrl + "/lists/", newTodo)
-        .then((response) => {
-          this.todos.push(response.data);
-          console.log("ToDo erfolgreich hinzugefügt:", response.data);
-        })
-        .catch((error) => {
-          console.error("Fehler beim Hinzufügen des ToDos:", error);
-        });
+    // Hier muss die `listId` des Nutzers bekannt sein
+    const listId = "679b786143b172bc1bf200fb"; // Die richtige `listId` einsetzen!
 
-      this.todoText = "";
-      this.todoDescription = "";
-      this.todoDate = "";
+    axios.patch(`${backendUrl}/lists/:${listId}`, {
+      userId: "0000000143b172bc1bf200fa",
+      type: "todolist",
+      items: [...this.todos, newTodo] // Bestehende Todos + neues Todo senden
+    })
+    .then((response) => {
+      this.todos.push(newTodo);
+      console.log("ToDo erfolgreich hinzugefügt:", response.data);
+    })
+    .catch((error) => {
+      console.error("Fehler beim Hinzufügen des ToDos:", error);
+    });
+
+    this.todoText = "";
+    this.todoDescription = "";
+    this.todoDate = "";
   }
 },
     removeTodo(index) {
