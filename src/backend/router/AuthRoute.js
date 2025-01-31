@@ -90,6 +90,7 @@ router.post('/register', async (req, res) => {
         // Send verification email
         try {
             await sendVerificationEmail(email, user.verificationToken);
+            console.log('Verification email sent successfully');
         } catch (emailError) {
             console.error('Failed to send verification email:', emailError);
             // Continue with registration even if email fails
