@@ -21,13 +21,13 @@ const routes = [
     path: '/home',
     name: 'home',
     component: HomeView,
-    meta: { requiresAuth: true } // Add meta field for authentication
+    meta: { requiresAuth: false } // Add meta field for authentication
   },
   {
     path: '/about',
     name: 'about',
     component: AboutView,
-    meta: { requiresAuth: true } // Add meta field for authentication
+    meta: { requiresAuth: false } // Add meta field for authentication
   },
   {
     path: '/user',
