@@ -2,7 +2,7 @@
   <div class="home-view">
     <div class="page-header">
       <h1>Welcome to HomeSphere</h1>
-      <p class="subtitle">Your digital home management system</p>
+      <p class="subtitle">{{ this.joke }}</p>
     </div>
     
     <div class="content-grid">
@@ -54,8 +54,30 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
-  name: 'HomeView'
+  name: 'HomeView',
+
+  data() {
+    return {
+      joke: "",
+    }
+  },
+  mounted() {
+    this.getJoke()
+  },
+  methods: {
+    async getJoke() {
+      try {
+        const response = await axios.get("https://witzapi.de/api/joke/");
+        this.joke = response.data[0].text;
+      } catch (error) {
+        console.error('Fehler beim Abrufen der Daten:', error);
+      }
+    
+    }
+  }
+  
 }
 </script>
 
