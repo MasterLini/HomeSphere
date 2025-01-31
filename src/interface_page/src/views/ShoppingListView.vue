@@ -34,7 +34,6 @@
             <option value="amount">Stück (St.)</option>
             <option value="litre">Liter (L)</option>
             <option value="kilogram">Kilogramm (kg)</option>
-            <option value="package">Packungen</option>
           </select>
         </div>
         <button type="submit" class="btn">
@@ -106,8 +105,7 @@ export default {
       unitOptions: {
       amount: "Stück (St.)",
       litre: "Liter (L)",
-      kilogram: "Kilogramm (kg)",
-      package: "Packungen"
+      kilogram: "Kilogramm (kg)"
     }
     };
   },

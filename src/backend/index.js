@@ -11,14 +11,11 @@ const listRoute = require('./router/ListRoute');
 const familyRoute = require('./router/FamilyRoute');
 const userRoute = require('./router/UserRoute');
 const { logRoutes } = require('./utils/routeLogger');
-const cors = require('cors');
-
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
-app.use(cors());
 
 app.use(loggerMiddleware);
 app.use(bodyParser.json());

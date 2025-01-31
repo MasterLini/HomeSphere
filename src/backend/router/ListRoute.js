@@ -79,7 +79,7 @@ router.patch('/:listId', async (req, res) => {
                         if (update.text) item.text = update.text;
                         if (update.description) item.description = update.description;
                         if (update.date) item.date = new Date(update.date);
-                        item.responsibilities = update.responsibilities || new ObjectId(userId || list.userId);
+                        item    .responsibilities = update.responsibilities || new ObjectId(userId || list.userId);
                     } else if (list.type === 'shoppinglist') {
                         if (update.productName) item.productName = update.productName;
                         if (update.quantity != null) item.quantity = update.quantity;
@@ -122,5 +122,5 @@ router.delete('/:listId', async (req, res) => {
         res.status(500).json({ error: 'An error occurred while deleting the list.' });
     }
 });
- 
+
 module.exports = router;
