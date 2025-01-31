@@ -109,7 +109,7 @@ export default {
     })
     .then((response) => {
       this.todos.push(newTodo);
-      console.log("ToDo erfolgreich hinzugefügt:", response.data);
+      console.log("Todo erfolgreich hinzugefügt:", response.data);
     })
     .catch((error) => {
       console.error("Fehler beim Hinzufügen des ToDos:", error);
