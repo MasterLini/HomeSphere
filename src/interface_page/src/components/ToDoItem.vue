@@ -1,81 +1,101 @@
 <template>
-    
-      <div class="postIt" :style="{ backgroundImage: todo.completed ? 'url(/postit-green.svg)' : 'url(' + randomSvg + ')' }">
-        <div class="content">
-        <input 
-          type="checkbox" 
-          v-model="todo.completed" 
+  <div
+      class="postIt"
+      :style="{
+      backgroundImage: todo.completed
+        ? 'url(/postit-green.svg)'
+        : 'url(' + randomSvg + ')'
+    }"
+  >
+    <div class="content">
+      <input
+          type="checkbox"
+          v-model="todo.completed"
           class="me-2"
           @change="toggleCompleted"
-        />
-        <br>
-        <span contenteditable="true" @input="updateTodo" :class="{ 'completed': todo.completed}">
-          {{ todo.text }}
-        </span>
-        <br>
-        <span :class="{ 'completed': todo.completed }">
-          {{ todo.description }}
-        </span>
-        <br>
-        <span :class="{ 'completed': todo.completed }">
-          {{ formatDate(todo.date) }}
-        </span>
-        <br>
+      />
+      <br />
+
+      <!-- TRIGGER UPDATE ON BLUR INSTEAD OF ON EVERY INPUT -->
+      <span
+          contenteditable="true"
+          @blur="updateTodo"
+          :class="{ 'completed': todo.completed }"
+      >
+        {{ todo.text }}
+      </span>
+      <br />
+
+      <span :class="{ 'completed': todo.completed }">
+        {{ todo.description }}
+      </span>
+      <br />
+
+      <span :class="{ 'completed': todo.completed }">
+        {{ formatDate(todo.date) }}
+      </span>
+      <br />
+
       <button class="btn btn-danger btn-sm" @click="remove">&#128465;</button>
     </div>
-    </div>
-    
-  </template>
-  
-  <script>
+  </div>
+</template>
 
-  export default {
-    name: "ToDoItem",
-    props: {
-      todo: {
-        type: Object,
-        required: true
-      },
-      index: {
-        type: Number,
-        required: true
-      }
+<script>
+export default {
+  name: "ToDoItem",
+  props: {
+    todo: {
+      type: Object,
+      required: true
     },
-    data() {
-      return {
-        svgVariants: [
+    index: {
+      type: Number,
+      required: true
+    }
+  },
+  data() {
+    return {
+      svgVariants: [
         '/postit-pink.svg',
         '/postit-yellow.svg',
         '/postit-red.svg'
       ],
       randomSvg: ''
-    }
+    };
+  },
+  mounted() {
+    // Randomize which background color / style is used
+    this.randomSvg = this.svgVariants[
+        Math.floor(Math.random() * this.svgVariants.length)
+        ];
+  },
+  methods: {
+    remove() {
+      this.$emit("remove", this.index);
     },
-    mounted() {
-      this.randomSvg = this.svgVariants[Math.floor(Math.random() * this.svgVariants.length)];
+    toggleCompleted() {
+      this.$emit("check", {
+        index: this.index,
+        completed: this.todo.completed
+      });
     },
-    methods: {
-      remove() {
-        this.$emit("remove", this.index);
-      },
-      toggleCompleted() {
-        this.$emit("check", { index: this.index, completed: this.todo.completed });
-      },
-      updateTodo(event) {
-        const updatedText = event.target.textContent.trim();
-        this.$emit("update", {index: this.index, newText: updatedText});
-      },
-      formatDate(date) {
-        if (date.trim() !== "")
-        {
-          const [yyyy, mm, dd] = date.split("-");
-          return `${dd}-${mm}-${yyyy}`;
-        }
-        
-      }
+    updateTodo(event) {
+      // On blur, read the textContent from the span
+      const updatedText = event.target.textContent.trim();
+      this.$emit("update", {
+        index: this.index,
+        newText: updatedText
+      });
+    },
+    formatDate(date) {
+      if (!date || date.trim() === "") return "";
+      const [yyyy, mm, dd] = date.split("-");
+      return `${dd}-${mm}-${yyyy}`;
     }
-  };
-  </script>
+  }
+};
+</script>
   
   <style>
 @import url('https://fonts.googleapis.com/css2?family=Yuji+Mai&display=swap');

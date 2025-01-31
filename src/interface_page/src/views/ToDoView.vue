@@ -4,14 +4,14 @@
       <h1>ToDo-Liste</h1>
       <p class="subtitle">Erstellen Sie ganz einfach ToDo's und weisen Sie Familienmitglieder zu</p>
     </div>
-    
+
     <div class="card todo-form">
       <form @submit.prevent="addTodo" class="form-content">
         <div class="form-group">
-          <input 
-            v-model="todoText" 
-            type="text" 
-            placeholder="ToDo-Titel eingeben..." 
+          <input
+            v-model="todoText"
+            type="text"
+            placeholder="ToDo-Titel eingeben..."
             maxlength="40"
             class="todo-input"
             required
@@ -44,26 +44,25 @@
     </div>
 
     <div class="todo-grid">
-      <ToDoItem 
-        v-for="(todo, index) in sortTodo()" 
-        :key="index" 
-        :todo="todo" 
-        :index="index" 
+      <ToDoItem
+        v-for="(todo, index) in sortTodo()"
+        :key="index"
+        :todo="todo"
+        :index="index"
         @remove="removeTodo"
         @update="updateTodo"
+        @check="updateTodoCompletion"
       />
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
 import ToDoItem from "../components/ToDoItem.vue";
-import axios from 'axios';
 
-//const backendUrl = `http://${process.env.VUE_APP_SERVER_IP}:${process.env.VUE_APP_SERVER_PORT}`;
 const backendUrl = `http://localhost:3000`;
-console.log(process.env);
-console.log(backendUrl)
+
 export default {
   name: "todo",
   components: {
@@ -71,79 +70,206 @@ export default {
   },
   data() {
     return {
-      todoText: "", 
+      userId: null,           // e.g. read from localStorage or Vuex
+      todoText: "",
       todoDescription: "",
       todoDate: "",
-      todos: [],
-      isAscending: true,
-      data: []
+      todos: [],              // local array of todo items
+      lists: [],              // raw array of list objects from the server
+      isAscending: true
     };
   },
   computed: {
     sortIcon() {
       return this.isAscending ? "bi bi-sort-up" : "bi bi-sort-down";
-    },
+    }
   },
-  mounted() {
-    this.fetchData();
+  created() {
+    /**
+     * 1) Set the baseURL so we can do relative requests like axios.get('/me').
+     * 2) Register an interceptor to automatically include the token (if any).
+     */
+    axios.defaults.baseURL = "http://localhost:3000";
+
+    // If you use a token-based auth (e.g. Bearer token in LocalStorage):
+    axios.interceptors.request.use(
+        (config) => {
+          const token = localStorage.getItem("token");
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
+          return config;
+        },
+        (error) => {
+          return Promise.reject(error);
+        }
+    );
+
+    // If you prefer cookie-based sessions instead, comment out the above
+    // lines and use: axios.defaults.withCredentials = true;
+  },
+  async mounted() {
+    try {
+      // 1. Get the current user from /me
+      const response = await axios.get(`${backendUrl}/users/me`);
+      // Example: the server returns user object with `_id` and possibly other fields
+
+      console.log(response.data)
+      this.userId = response.data._id;
+
+      // 2. If no user found, handle accordingly (redirect or show error)
+      if (!this.userId) {
+        console.warn("No userId available from /me route");
+        return;
+      }
+    } catch (error) {
+      console.error("Error retrieving user:", error);
+      // handle error gracefully (e.g., redirect to login)
+      return;
+    }
+
+    // 3. Now that we have the userId, initialize list + load items
+    await this.initUserTodoList();
+    this.loadTodoItemsFromLists();
     this.setMinimumDate();
-    },
+  },
   methods: {
-  addTodo() {
-    if (this.todoText.trim() !== "") {
-    const newTodo = {
-      id: new Date().getTime().toString(), // Temporäre ID (MongoDB ersetzt sie später)
-      text: this.todoText,
-      description: this.todoDescription || "", // Optional
-      date: this.todoDate || null, // Optional
-      responsibilities: null, // Wird vom Backend gefüllt
-    };
+    /**
+     * Ensure the user has exactly one "todolist".
+     * If none is found, create a fresh one on the backend.
+     */
+    async initUserTodoList() {
+      try {
+        // 1. Check if the user already has a todolist
+        const response = await axios.get(
+            `${backendUrl}/lists?userId=${this.userId}&type=todolist`
+        );
 
-    // Hier muss die `listId` des Nutzers bekannt sein
-    const listId = "679b786143b172bc1bf200fb"; // Die richtige `listId` einsetzen!
+        this.lists = response.data; // This should be an array of lists
 
-    axios.patch(`${backendUrl}/lists/:${listId}`, {
-      userId: "0000000143b172bc1bf200fa",
-      type: "todolist",
-      items: [...this.todos, newTodo] // Bestehende Todos + neues Todo senden
-    })
-    .then((response) => {
-      this.todos.push(newTodo);
-      console.log("ToDo erfolgreich hinzugefügt:", response.data);
-    })
-    .catch((error) => {
-      console.error("Fehler beim Hinzufügen des ToDos:", error);
-    });
+        // 2. If there's no existing to-do list, create one
+        if (!this.lists || this.lists.length === 0) {
+          const createResponse = await axios.post(`${backendUrl}/lists`, {
+            userId: this.userId,
+            type: "todolist",
+            items: []
+          });
+          console.log("Created a new to-do list:", createResponse.data);
 
-    this.todoText = "";
-    this.todoDescription = "";
-    this.todoDate = "";
-  }
-},
-    removeTodo(index) {
-      this.todos.splice(index, 1);
+          // Now fetch again to refresh this.lists
+          const secondFetch = await axios.get(
+              `${backendUrl}/lists?userId=${this.userId}&type=todolist`
+          );
+          this.lists = secondFetch.data;
+        }
+      } catch (error) {
+        console.error("Error in initUserTodoList:", error);
+      }
     },
+
+    /**
+     * After we have the user's lists, pick out the 'todolist' and sync to `this.todos`.
+     */
+    loadTodoItemsFromLists() {
+      const todoList = this.lists.find(list => list.type === "todolist");
+      this.todos = todoList ? todoList.items : [];
+    },
+
+    /**
+     * Add a new ToDo item to the user's existing to-do list.
+     */
+    async addTodo() {
+      if (!this.todoText.trim()) return; // basic validation
+
+      const newItem = {
+        text: this.todoText,
+        description: this.todoDescription,
+        date: this.todoDate
+        // responsibilities: (handled by backend if needed)
+      };
+
+      // 1. Find the user's todolist in this.lists (we ensured it exists in initUserTodoList)
+      const todoList = this.lists.find(list => list.type === "todolist");
+      if (!todoList) {
+        console.error("No to-do list found, cannot add item!");
+        return;
+      }
+
+      try {
+        // 2. Update the list’s items array in memory
+        todoList.items.push(newItem);
+
+        // 3. Send a PATCH request with the updated items
+        const patchResponse = await axios.patch(`${backendUrl}/lists/${todoList._id}`, {
+          type: "todolist",
+          items: todoList.items,
+          userId: this.userId
+        });
+        console.log("Updated existing list:", patchResponse.data);
+
+        // 4. Refresh local state
+        this.todoText = "";
+        this.todoDescription = "";
+        this.todoDate = "";
+        // Re-load from server or just trust the local state:
+        //    EITHER do a fresh fetch...
+        //       await this.initUserTodoList();
+        //       this.loadTodoItemsFromLists();
+        //    OR trust the local changes:
+        this.todos = todoList.items;
+      } catch (error) {
+        console.error("Error adding new item:", error);
+      }
+    },
+
+    /**
+     * Remove a to-do from the user's local array & DB.
+     */
+    async removeTodo(index) {
+      try {
+        const todoList = this.lists.find(list => list.type === "todolist");
+        if (!todoList) return;
+
+        // Identify the item’s id
+        const itemId = todoList.items[index].id;
+
+        // PATCH the list or use DELETE to remove that item
+        const updatedItems = todoList.items.filter(item => item.id !== itemId);
+
+        const deleteResponse = await axios.delete(`${backendUrl}/lists/${todoList._id}`, {
+          data: { itemId } // must be in request body for this route
+        });
+        console.log("Deleted item:", deleteResponse.data);
+
+        // Update local arrays
+        todoList.items = updatedItems;
+        this.todos = updatedItems;
+      } catch (error) {
+        console.error("Error removing item:", error);
+      }
+    },
+
+    /**
+     * Example method to mark an item completed, etc.
+     * (You’d just patch the list with the updated item).
+     */
     updateTodo({ index, completed }) {
       this.todos[index].completed = completed;
+      // Then call the PATCH route with the updated items as above
     },
+
     setMinimumDate() {
       const today = new Date();
       const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0'); 
-      const dd = String(today.getDate()).padStart(2, '0'); 
+      const mm = String(today.getMonth() + 1).padStart(2, "0");
+      const dd = String(today.getDate()).padStart(2, "0");
       const currentDate = `${yyyy}-${mm}-${dd}`;
 
-      document.querySelectorAll('input[type="date"]').forEach(input => input.setAttribute('min', currentDate));      
+      document.querySelectorAll('input[type="date"]').forEach(input => {
+        input.setAttribute("min", currentDate);
+      });
     },
-    async fetchData() {
-      try {
-        const response = await axios.get(backendUrl + "/lists/");
-        this.data = response.data;
-        console.log(this.data)
-      } catch (error) {
-        console.error('Fehler beim Abrufen der Daten:', error);
-      }
-    },
+
     sortTodo() {
       return this.todos.slice().sort((a, b) => {
         const dateA = new Date(a.date);
@@ -151,9 +277,10 @@ export default {
         return this.isAscending ? dateA - dateB : dateB - dateA;
       });
     },
+
     toggleSort() {
       this.isAscending = !this.isAscending;
-    },
+    }
   }
 };
 </script>
