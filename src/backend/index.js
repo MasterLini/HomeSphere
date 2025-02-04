@@ -45,6 +45,11 @@ const startServer = async () => {
         await connectDB();
         registerRoutes(app);
 
+        // Add ping endpoint for connectivity checks
+        app.get('/ping', (req, res) => {
+            res.json({ status: "ok" });
+        });
+
         app.listen(port, () => {
             console.log(`Server running at http://localhost:${port}`);
             console.log('Registered Routes:');

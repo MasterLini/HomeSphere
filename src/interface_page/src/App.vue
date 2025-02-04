@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <template v-if="!isAuthRoute">
-      <Sidebar />
+      <Sidebar :user="user" />
       <div class="main-content">
         <router-view />
       </div>
@@ -14,15 +14,32 @@
 
 <script>
 import Sidebar from './components/Sidebar.vue';
+import { getUserInfo } from './api/user';
 
 export default {
   components: {
     Sidebar,
   },
+  data() {
+    return {
+      user: null,
+    };
+  },
   computed: {
     isAuthRoute() {
       return this.$route.path === '/auth';
     }
+  },
+  mounted() {
+    // First, get the authenticated user info from /users/me
+    getUserInfo()
+      .then(data => {
+        this.user = data;
+        console.log('Authenticated user:', data);
+      })
+      .catch(err => {
+        console.error('Error fetching authenticated user:', err);
+      });
   }
 };
 </script>

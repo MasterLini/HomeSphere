@@ -30,7 +30,7 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ message: 'Email or password is required' });
         }
 
-        const db  = getDB(process.env.DB_NAME);
+        const db  = getDB();
 
         const user = await db.collection('users').findOne({ email });
         if (!user) {
@@ -76,7 +76,7 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
-        const db = getDB(process.env.DB_NAME);
+        const db = getDB();
         const existingUser = await db.collection('users').findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
             return res.status(400).json({ message: 'Username or email already exists' });
@@ -110,7 +110,7 @@ router.post('/register', async (req, res) => {
 router.get('/verify/:token', async (req, res) => {
     try {
         const { token } = req.params;
-        const db = getDB(process.env.DB_NAME);
+        const db = getDB();
 
         // Find user with matching token and token not expired
         const user = await db.collection('users').findOne({
@@ -141,7 +141,7 @@ router.get('/verify/:token', async (req, res) => {
     }
 });
 
-router.post('/logout', async (req, res) => {
+router.post('/logout', isTokenBlacklist, async (req, res) => {
     const token = req.token;
     tokenBlacklist.add(token);
     res.status(200).json({ message: 'User logged out!' });

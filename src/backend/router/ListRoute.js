@@ -33,18 +33,28 @@ router.post('/', async (req, res) => {
 // GET: Retrieve lists
 router.get('/', async (req, res) => {
     const { userId, type } = req.query;
-
+    const db = getDB();
     try {
-        const db = getDB();
-        const query = {};
+        let query = { type };
 
-        if (userId) query.userId = new ObjectId(userId);
-        if (type) query.type = type;
-
+        // Validate and convert userId if provided.
+        if (userId) {
+            if (ObjectId.isValid(userId)) {
+                query.userId = new ObjectId(userId);
+            } else {
+                // Option 1: If your app uses ObjectId for userId, return an error:
+                return res.status(400).json({ error: 'Invalid userId format' });
+                // Option 2: If user IDs are stored as strings in your lists collection,
+                // use:
+                // query.userId = userId;
+            }
+        }
+        
         const lists = await db.collection('lists').find(query).toArray();
         res.status(200).json(lists);
     } catch (error) {
-        res.status(500).json({ error: 'An error occurred while retrieving the lists.' });
+        console.error('Error fetching lists:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
