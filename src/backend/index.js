@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const path = require('path');
@@ -11,11 +12,12 @@ const listRoute = require('./router/ListRoute');
 const familyRoute = require('./router/FamilyRoute');
 const userRoute = require('./router/UserRoute');
 const { logRoutes } = require('./utils/routeLogger');
-
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+app.use(cors());
 
 app.use(loggerMiddleware);
 app.use(bodyParser.json());
