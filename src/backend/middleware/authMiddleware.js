@@ -6,17 +6,18 @@ const authMiddleware = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader) {
-            console.warn('Authorization header is missing');
-            return res.status(401).json({ message: 'Authorization header is missing' });
+            console.error('Authorization header missing');
+            return res.status(401).json({ message: 'No token provided' });
         }
 
-        const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7, authHeader.length) : authHeader;
+        const token = authHeader.split(' ')[1];
         if (!token) {
             console.warn('Token is missing');
             return res.status(401).json({ message: 'Token is missing' });
         }
 
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        console.log('Token verified successfully:', decoded);
 
         const db = getDB();
         const cacheKey = `user_${decoded.userId}`;
@@ -42,6 +43,7 @@ const authMiddleware = async (req, res, next) => {
             return res.status(401).json({ message: 'Token expired' });
         }
         if (error.name === 'JsonWebTokenError') {
+            console.error('Token verification error:', error.message);
             return res.status(401).json({ message: 'Invalid token' });
         }
         res.status(500).json({ message: 'Internal server error' });

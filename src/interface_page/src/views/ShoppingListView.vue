@@ -88,7 +88,9 @@
 
 <script>
 import ShoppingListItem from '@/components/ShoppingListItem.vue';
-import axios from 'axios';
+import { fetchLists, createList, deleteList } from '@/api/lists';
+import { getUserInfo } from '@/api/user';
+
 const backendUrl = `http://${process.env.VUE_APP_SERVER_IP}:${process.env.VUE_APP_SERVER_PORT}`;
 
 export default {
@@ -108,12 +110,16 @@ export default {
       litre: "Liter (L)",
       kilogram: "Kilogramm (kg)",
       package: "Packung"
-    }
+    },
+    shoppingLists: [],
+    loading: false,
+    userId: null,
     };
   },
   mounted() {
     // Event listener für Klicks auf das Dokument hinzufügen
     document.addEventListener('click', this.handleClickOutside);
+    this.loadShoppingList();
   },
   beforeDestroy() {
     // Event listener entfernen, wenn die Komponente zerstört wird
@@ -169,6 +175,50 @@ export default {
         console.error('Fehler beim Abrufen der Daten:', error);
       }
     },
+    async loadShoppingList() {
+      this.loading = true;
+      try {
+        if (!this.userId) {
+          console.warn('No authenticated user found in ShoppingListView.');
+          return;
+        }
+        const lists = await fetchLists({ userId: this.userId, type: 'shoppinglist' });
+        this.shoppingLists = lists;
+      } catch (error) {
+        console.error('Error fetching shopping list:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async createShoppingItem() {
+      try {
+        if (!this.userId) {
+          console.warn('No authenticated user found in ShoppingListView.');
+          return;
+        }
+        const newShoppingList = {
+          userId: this.userId,
+          type: 'shoppinglist',
+          items: [{
+            productName: "New Product",
+            quantity: 1,
+          }],
+          createdAt: new Date()
+        };
+        await createList(newShoppingList);
+        this.loadShoppingList();
+      } catch (error) {
+        console.error('Error creating shopping item:', error);
+      }
+    },
+    async removeItem(listId, itemId) {
+      try {
+        await deleteList(listId, itemId);
+        this.loadShoppingList();
+      } catch (error) {
+        console.error('Error removing shopping item:', error);
+      }
+    }
   }
 };
 </script>

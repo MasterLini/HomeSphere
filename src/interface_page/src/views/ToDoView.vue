@@ -60,6 +60,8 @@
 <script>
 import axios from "axios";
 import ToDoItem from "../components/ToDoItem.vue";
+import { fetchLists, createList, deleteList } from '@/api/lists';
+import { getUserInfo } from '@/api/user';
 
 const backendUrl = `http://localhost:3000`;
 
@@ -70,13 +72,15 @@ export default {
   },
   data() {
     return {
-      userId: null,           // e.g. read from localStorage or Vuex
+      userId: null,
       todoText: "",
       todoDescription: "",
       todoDate: "",
-      todos: [],              // local array of todo items
-      lists: [],              // raw array of list objects from the server
-      isAscending: true
+      todos: [],
+      lists: [],
+      isAscending: true,
+      todoLists: [],
+      loading: false,
     };
   },
   computed: {
@@ -110,28 +114,24 @@ export default {
   },
   async mounted() {
     try {
-      // 1. Get the current user from /me
-      const response = await axios.get(`${backendUrl}/users/me`);
-      // Example: the server returns user object with `_id` and possibly other fields
+      // Get authenticated user info using getUserInfo API helper
+      const data = await getUserInfo();
+      this.userId = data._id;
+      console.log('Authenticated user (ToDoView):', data);
 
-      console.log(response.data)
-      this.userId = response.data._id;
+      // Ensure a todolist exists for this user
+      await this.initUserTodoList();
 
-      // 2. If no user found, handle accordingly (redirect or show error)
-      if (!this.userId) {
-        console.warn("No userId available from /me route");
-        return;
-      }
-    } catch (error) {
-      console.error("Error retrieving user:", error);
-      // handle error gracefully (e.g., redirect to login)
-      return;
+      // Load lists from backend (the todolist should be among these)
+      await this.loadTodos();
+
+      // Extract the todolist items into the todos array.
+      const todoList = this.lists.find(list => list.type === "todolist");
+      this.todos = todoList ? todoList.items : [];
+
+    } catch (err) {
+      console.error('Error fetching authenticated user or todolist in ToDoView:', err);
     }
-
-    // 3. Now that we have the userId, initialize list + load items
-    await this.initUserTodoList();
-    this.loadTodoItemsFromLists();
-    this.setMinimumDate();
   },
   methods: {
     /**
@@ -196,7 +196,7 @@ export default {
       }
 
       try {
-        // 2. Update the list’s items array in memory
+        // 2. Update the list's items array in memory
         todoList.items.push(newItem);
 
         // 3. Send a PATCH request with the updated items
@@ -230,7 +230,7 @@ export default {
         const todoList = this.lists.find(list => list.type === "todolist");
         if (!todoList) return;
 
-        // Identify the item’s id
+        // Identify the item's id
         const itemId = todoList.items[index].id;
 
         // PATCH the list or use DELETE to remove that item
@@ -251,7 +251,7 @@ export default {
 
     /**
      * Example method to mark an item completed, etc.
-     * (You’d just patch the list with the updated item).
+     * (You'd just patch the list with the updated item).
      */
     updateTodo({ index, completed }) {
       this.todos[index].completed = completed;
@@ -280,8 +280,54 @@ export default {
 
     toggleSort() {
       this.isAscending = !this.isAscending;
+    },
+
+    async loadTodos() {
+      this.loading = true;
+      try {
+        // Use the real userId obtained from /users/me once available.
+        if (!this.userId) {
+          console.warn('No authenticated user found.');
+          return;
+        }
+        const lists = await fetchLists({ userId: this.userId, type: 'todolist' });
+        this.lists = lists; // store fetched lists here for addTodo() to use
+      } catch (error) {
+        console.error('Error fetching todos:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async createTodo() {
+      if (!this.userId) {
+        console.warn('No authenticated user found in ToDoView.');
+        return;
+      }
+      const newTodo = {
+        userId: this.userId,
+        type: 'todolist',
+        items: [{
+          text: "New Task",
+          description: "Task description",
+          date: new Date(),
+          responsibilities: this.userId,
+        }],
+        createdAt: new Date()
+      };
+      await createList(newTodo);
+      this.loadTodos();
+    },
+
+    async removeTodo(listId, itemId) {
+      try {
+        await deleteList(listId, itemId);
+        this.loadTodos();
+      } catch (error) {
+        console.error('Error deleting todo item:', error);
+      }
     }
-  }
+  },
 };
 </script>
 
