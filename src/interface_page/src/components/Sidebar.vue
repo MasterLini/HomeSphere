@@ -34,11 +34,19 @@
           </router-link>
         </li>
       </div>  
-      <div class="user-icon mt-auto p-3">
-        <router-link to="/user" class="nav-link" active-class="active">
-          <span class="icon">&#128100;</span>
-          <span class="tooltip">Profile</span>
-        </router-link>
+      <div class="bottom-nav">
+        <div class="nav-item">
+          <router-link to="/user" class="nav-link" active-class="active">
+            <span class="icon">&#128100;</span>
+            <span class="tooltip">Profile</span>
+          </router-link>
+        </div>
+        <div class="nav-item">
+          <button @click="handleLogout" class="nav-link logout-btn">
+            <span class="icon">&#128682;</span>
+            <span class="tooltip">Logout</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -50,8 +58,27 @@
 </template>
 
 <script>
+import { logout } from '@/api/auth';
+import { useRouter } from 'vue-router';
+
 export default {
   name: 'Sidebar',
+  setup() {
+    const router = useRouter();
+
+    const handleLogout = async () => {
+      try {
+        logout();
+        await router.push('/auth');
+      } catch (error) {
+        console.error('Logout failed:', error);
+      }
+    };
+
+    return {
+      handleLogout
+    };
+  }
 };
 </script>
 
@@ -168,5 +195,35 @@ export default {
 
 .main-content {
   margin-left: 80px; /* Gleiche Breite wie Sidebar */
+}
+
+.bottom-nav {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  width: 44px;
+  height: 44px;
+}
+
+.logout-btn:hover {
+  background-color: #ff4444;
+  color: white;
+}
+
+.logout-btn:hover .tooltip {
+  background-color: #ff4444;
+}
+
+.logout-btn:hover .tooltip::before {
+  border-right-color: #ff4444;
 }
 </style>

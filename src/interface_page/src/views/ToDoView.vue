@@ -5,8 +5,20 @@
       <p class="subtitle">Erstellen Sie ganz einfach ToDo's und weisen Sie Familienmitglieder zu</p>
     </div>
 
+    <div v-if="error" class="error-message">
+      {{ error }}
+    </div>
+
+    <div v-if="loading" class="loading-overlay">
+      <span class="loading-spinner">🔄</span>
+      <p>Loading...</p>
+    </div>
+
     <div class="card todo-form">
-      <form @submit.prevent="addTodo" class="form-content">
+      <form @submit.prevent="addTodo" class="form-content" :class="{ 'loading': loading }">
+        <div v-if="formError" class="form-error">
+          {{ formError }}
+        </div>
         <div class="form-group">
           <input
             v-model="todoText"
@@ -14,7 +26,9 @@
             placeholder="ToDo-Titel eingeben..."
             maxlength="40"
             class="todo-input"
+            :class="{ 'invalid': isTitleInvalid }"
             required
+            @focus="formError = null"
       />
         </div>
         <div class="form-group">
@@ -24,18 +38,24 @@
             placeholder="ToDo-Beschreibung eingeben..."
             maxlength="160"
             class="todo-input"
+            @focus="formError = null"
           />
         </div>
         <div class="form-group">
           <input
-        v-model="todoDate"
-        type="date"
-        class="todo-input"
-        />
+            v-model="todoDate"
+            type="date"
+            class="todo-input"
+            :class="{ 'invalid': isDateInvalid }"
+            :min="new Date().toISOString().split('T')[0]"
+            required
+            @focus="formError = null"
+          />
       </div>
-      <button type="submit" class="btn">
-          <span class="icon">✨</span>
-          Hinzufügen
+      <button type="submit" class="btn" :disabled="loading">
+          <span v-if="loading" class="loading-spinner">🔄</span>
+          <span v-else class="icon">✨</span>
+          {{ loading ? 'Wird hinzugefügt...' : 'Hinzufügen' }}
         </button>
       </form>
       <button @click="toggleSort" class="btn btn-primary">
@@ -46,7 +66,7 @@
     <div class="todo-grid">
       <ToDoItem
         v-for="(todo, index) in sortTodo()"
-        :key="index"
+        :key="todo.id || index"
         :todo="todo"
         :index="index"
         @remove="removeTodo"
@@ -58,17 +78,27 @@
 </template>
 
 <script>
-import axios from "axios";
 import ToDoItem from "../components/ToDoItem.vue";
-import { fetchLists, createList, deleteList } from '@/api/lists';
+import { getTodoLists, createTodoList, deleteTodoList, updateTodoList } from '@/api/lists';
 import { getUserInfo } from '@/api/user';
-
-const backendUrl = `http://localhost:3000`;
 
 export default {
   name: "todo",
   components: {
     ToDoItem
+  },
+  created() {
+    console.log('[DEBUG] ToDoView created');
+  },
+  beforeMount() {
+    console.log('[DEBUG] ToDoView beforeMount');
+  },
+  beforeUnmount() {
+    console.log('[DEBUG] ToDoView beforeUnmount');
+  },
+  unmounted() {
+    console.log('[DEBUG] ToDoView unmounted, resetting initialized state');
+    this.initialized = false;
   },
   data() {
     return {
@@ -79,58 +109,90 @@ export default {
       todos: [],
       lists: [],
       isAscending: true,
-      todoLists: [],
       loading: false,
+      error: null,
+      formError: null,
+      initialized: false,
+      initializationInProgress: false
     };
   },
   computed: {
     sortIcon() {
       return this.isAscending ? "bi bi-sort-up" : "bi bi-sort-down";
+    },
+    isTitleInvalid() {
+      return this.formError && !this.todoText.trim();
+    },
+    isDateInvalid() {
+      return this.formError && !this.todoDate;
     }
   },
-  created() {
-    /**
-     * 1) Set the baseURL so we can do relative requests like axios.get('/me').
-     * 2) Register an interceptor to automatically include the token (if any).
-     */
-    axios.defaults.baseURL = "http://localhost:3000";
-
-    // If you use a token-based auth (e.g. Bearer token in LocalStorage):
-    axios.interceptors.request.use(
-        (config) => {
-          const token = localStorage.getItem("token");
-          if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-          }
-          return config;
-        },
-        (error) => {
-          return Promise.reject(error);
-        }
-    );
-
-    // If you prefer cookie-based sessions instead, comment out the above
-    // lines and use: axios.defaults.withCredentials = true;
+  watch: {
+    '$route'(to, from) {
+      console.log('[DEBUG] Route changed in ToDoView', {
+        to: to.path,
+        from: from.path,
+        initialized: this.initialized,
+        inProgress: this.initializationInProgress
+      });
+    }
   },
   async mounted() {
+    console.log('[DEBUG] ToDoView mounted', {
+      initialized: this.initialized,
+      inProgress: this.initializationInProgress,
+      userId: this.userId,
+      route: this.$route.path,
+      lists: this.lists.length
+    });
+
+    if (this.initialized) {
+      console.log('[DEBUG] ToDoView already initialized, skipping');
+      return;
+    }
+
+    if (this.initializationInProgress) {
+      console.log('[DEBUG] Initialization in progress, skipping');
+      return;
+    }
+
     try {
-      // Get authenticated user info using getUserInfo API helper
+      this.loading = true;
+      this.initializationInProgress = true;
+      console.log('[DEBUG] Starting ToDoView initialization');
+
+      // Get authenticated user info
       const data = await getUserInfo();
       this.userId = data._id;
-      console.log('Authenticated user (ToDoView):', data);
+      console.log('[DEBUG] Authenticated user (ToDoView):', data);
 
-      // Ensure a todolist exists for this user
+      // Initialize and load todos
       await this.initUserTodoList();
 
-      // Load lists from backend (the todolist should be among these)
-      await this.loadTodos();
-
-      // Extract the todolist items into the todos array.
+      // Set initial todos from the list
       const todoList = this.lists.find(list => list.type === "todolist");
       this.todos = todoList ? todoList.items : [];
 
+      // Mark as initialized after successful setup
+      this.initialized = true;
+      console.log('[DEBUG] ToDoView initialization complete', {
+        initialized: this.initialized,
+        inProgress: this.initializationInProgress,
+        lists: this.lists.length,
+        todos: this.todos.length
+      });
     } catch (err) {
-      console.error('Error fetching authenticated user or todolist in ToDoView:', err);
+      console.error('[DEBUG] Error initializing ToDoView:', err);
+      this.error = 'Failed to load todo list. Please try again.';
+      // Reset initialization state on error
+      this.initialized = false;
+    } finally {
+      this.loading = false;
+      this.initializationInProgress = false;
+      console.log('[DEBUG] ToDoView initialization cleanup complete', {
+        initialized: this.initialized,
+        inProgress: this.initializationInProgress
+      });
     }
   },
   methods: {
@@ -139,56 +201,100 @@ export default {
      * If none is found, create a fresh one on the backend.
      */
     async initUserTodoList() {
+      if (this.initializationInProgress) {
+        console.log('[DEBUG] Initialization already in progress, skipping');
+        return;
+      }
+
+      this.initializationInProgress = true;
+      console.log('[DEBUG] Starting initUserTodoList');
+
       try {
-        // 1. Check if the user already has a todolist
-        const response = await axios.get(
-            `${backendUrl}/lists?userId=${this.userId}&type=todolist`
-        );
+        // 1. Get all todo lists
+        const lists = await getTodoLists();
+        console.log('[DEBUG] Got lists from server:', lists);
 
-        this.lists = response.data; // This should be an array of lists
+        // Filter for todolist type
+        const todoLists = lists.filter(list => list.type === 'todolist');
+        console.log('[DEBUG] Filtered todo lists:', todoLists);
 
-        // 2. If there's no existing to-do list, create one
-        if (!this.lists || this.lists.length === 0) {
-          const createResponse = await axios.post(`${backendUrl}/lists`, {
+        if (todoLists.length > 0) {
+          console.log('[DEBUG] Found existing todo lists:', todoLists.length);
+          // Use existing todo list
+          this.lists = todoLists;
+          return;
+        }
+
+        // 2. Create a new todo list if none exists
+        try {
+          console.log('[DEBUG] No existing todo lists found, creating new one');
+          console.log('[DEBUG] Attempting to create todo list with data:', {
+            userId: this.userId,
+            type: "todolist"
+          });
+
+          const newList = await createTodoList({
             userId: this.userId,
             type: "todolist",
             items: []
           });
-          console.log("Created a new to-do list:", createResponse.data);
 
-          // Now fetch again to refresh this.lists
-          const secondFetch = await axios.get(
-              `${backendUrl}/lists?userId=${this.userId}&type=todolist`
-          );
-          this.lists = secondFetch.data;
+          if (!newList) {
+            console.error('[DEBUG] Create todo list returned null/undefined');
+            throw new Error('Failed to create todo list: empty response');
+          }
+          console.log('[DEBUG] Successfully created new todo list:', newList);
+          this.lists = [newList];
+        } catch (createError) {
+          console.log('[DEBUG] Error creating todo list:', createError.response?.data);
+          if (createError.response?.data?.message === 'User already has a todo list') {
+            console.log('[DEBUG] List exists error, fetching updated lists');
+            // If list was created in another session, fetch again
+            const updatedLists = await getTodoLists();
+            const filteredLists = updatedLists.filter(list => list.type === 'todolist');
+            console.log('[DEBUG] Got updated lists:', filteredLists);
+            this.lists = filteredLists;
+          } else {
+            console.log('[DEBUG] Unknown error creating todo list:', createError);
+            throw createError;
+          }
         }
       } catch (error) {
-        console.error("Error in initUserTodoList:", error);
+        console.error("[DEBUG] Error in initUserTodoList:", error);
+        this.error = "Failed to initialize todo list. Please try again.";
+      } finally {
+        console.log('[DEBUG] Resetting initialization lock');
+        this.initializationInProgress = false;
       }
     },
 
-    /**
-     * After we have the user's lists, pick out the 'todolist' and sync to `this.todos`.
-     */
-    loadTodoItemsFromLists() {
-      const todoList = this.lists.find(list => list.type === "todolist");
-      this.todos = todoList ? todoList.items : [];
-    },
 
     /**
      * Add a new ToDo item to the user's existing to-do list.
      */
     async addTodo() {
-      if (!this.todoText.trim()) return; // basic validation
+      this.formError = null;
+
+      // Validate inputs
+      if (!this.todoText.trim()) {
+        this.formError = 'Please enter a todo title';
+        return;
+      }
+
+      if (!this.todoDate) {
+        this.formError = 'Please select a date';
+        return;
+      }
 
       const newItem = {
-        text: this.todoText,
-        description: this.todoDescription,
-        date: this.todoDate
-        // responsibilities: (handled by backend if needed)
+        text: this.todoText.trim(),
+        description: this.todoDescription.trim(),
+        date: this.todoDate,
+        responsibilities: this.userId,
+        completed: false
       };
 
-      // 1. Find the user's todolist in this.lists (we ensured it exists in initUserTodoList)
+      // Find the user's todolist
       const todoList = this.lists.find(list => list.type === "todolist");
       if (!todoList) {
         console.error("No to-do list found, cannot add item!");
@@ -196,27 +302,22 @@ export default {
       }
 
       try {
-        // 2. Update the list's items array in memory
-        todoList.items.push(newItem);
-
-        // 3. Send a PATCH request with the updated items
-        const patchResponse = await axios.patch(`${backendUrl}/lists/${todoList._id}`, {
+        // Add new item to the list
+        const updatedItems = [...todoList.items, newItem];
+        await updateTodoList(todoList._id, {
           type: "todolist",
-          items: todoList.items,
+          items: updatedItems,
           userId: this.userId
         });
-        console.log("Updated existing list:", patchResponse.data);
 
-        // 4. Refresh local state
+        // Update local state
+        todoList.items = updatedItems;
+        this.todos = updatedItems;
+
+        // Clear form
         this.todoText = "";
         this.todoDescription = "";
         this.todoDate = "";
-        // Re-load from server or just trust the local state:
-        //    EITHER do a fresh fetch...
-        //       await this.initUserTodoList();
-        //       this.loadTodoItemsFromLists();
-        //    OR trust the local changes:
-        this.todos = todoList.items;
       } catch (error) {
         console.error("Error adding new item:", error);
       }
@@ -227,35 +328,63 @@ export default {
      */
     async removeTodo(index) {
       try {
+        console.log('[DEBUG] Removing todo item at index:', index);
         const todoList = this.lists.find(list => list.type === "todolist");
-        if (!todoList) return;
+        if (!todoList) {
+          console.log('[DEBUG] No todo list found');
+          return;
+        }
 
-        // Identify the item's id
-        const itemId = todoList.items[index].id;
+        // Remove item from array
+        const updatedItems = [...todoList.items];
+        updatedItems.splice(index, 1);
+        console.log('[DEBUG] Updated items after removal:', updatedItems);
 
-        // PATCH the list or use DELETE to remove that item
-        const updatedItems = todoList.items.filter(item => item.id !== itemId);
-
-        const deleteResponse = await axios.delete(`${backendUrl}/lists/${todoList._id}`, {
-          data: { itemId } // must be in request body for this route
+        // Update the list in the backend
+        await updateTodoList(todoList._id, {
+          type: "todolist",
+          items: updatedItems,
+          userId: this.userId
         });
-        console.log("Deleted item:", deleteResponse.data);
 
-        // Update local arrays
+        // Update local state
         todoList.items = updatedItems;
         this.todos = updatedItems;
+        console.log('[DEBUG] Local state updated after removal');
       } catch (error) {
-        console.error("Error removing item:", error);
+        console.error("[DEBUG] Error removing item:", error);
+        this.error = "Failed to remove todo item. Please try again.";
       }
     },
 
     /**
-     * Example method to mark an item completed, etc.
-     * (You'd just patch the list with the updated item).
+     * Update a todo item's completion status
      */
-    updateTodo({ index, completed }) {
-      this.todos[index].completed = completed;
-      // Then call the PATCH route with the updated items as above
+    async updateTodo({ index, completed }) {
+      try {
+        const todoList = this.lists.find(list => list.type === "todolist");
+        if (!todoList) return;
+
+        // Update the item in the list
+        const updatedItems = [...todoList.items];
+        updatedItems[index] = {
+          ...updatedItems[index],
+          completed
+        };
+
+        // Update in backend
+        await updateTodoList(todoList._id, {
+          type: "todolist",
+          items: updatedItems,
+          userId: this.userId
+        });
+
+        // Update local state
+        todoList.items = updatedItems;
+        this.todos = updatedItems;
+      } catch (error) {
+        console.error("Error updating todo item:", error);
+      }
     },
 
     setMinimumDate() {
@@ -282,16 +411,43 @@ export default {
       this.isAscending = !this.isAscending;
     },
 
+    async updateTodoCompletion({ index, completed }) {
+      try {
+        const todoList = this.lists.find(list => list.type === "todolist");
+        if (!todoList) return;
+
+        // Update the item in the list
+        const updatedItems = [...todoList.items];
+        updatedItems[index] = {
+          ...updatedItems[index],
+          completed
+        };
+
+        // Update in backend
+        await updateTodoList(todoList._id, {
+          type: "todolist",
+          items: updatedItems,
+          userId: this.userId
+        });
+
+        // Update local state
+        todoList.items = updatedItems;
+        this.todos = updatedItems;
+      } catch (error) {
+        console.error("Error updating todo completion:", error);
+        this.error = "Failed to update todo status. Please try again.";
+      }
+    },
+
     async loadTodos() {
       this.loading = true;
       try {
-        // Use the real userId obtained from /users/me once available.
         if (!this.userId) {
           console.warn('No authenticated user found.');
           return;
         }
-        const lists = await fetchLists({ userId: this.userId, type: 'todolist' });
-        this.lists = lists; // store fetched lists here for addTodo() to use
+        const lists = await getTodoLists();
+        this.lists = lists;
       } catch (error) {
         console.error('Error fetching todos:', error);
       } finally {
@@ -315,17 +471,8 @@ export default {
         }],
         createdAt: new Date()
       };
-      await createList(newTodo);
+      await createTodoList(newTodo);
       this.loadTodos();
-    },
-
-    async removeTodo(listId, itemId) {
-      try {
-        await deleteList(listId, itemId);
-        this.loadTodos();
-      } catch (error) {
-        console.error('Error deleting todo item:', error);
-      }
     }
   },
 };
@@ -334,6 +481,70 @@ export default {
 <style scoped>
 body {
   overflow-x: hidden;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+  font-size: 2em;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.error-message {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.form-content.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.form-error {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.9em;
+}
+
+.form-group input.invalid {
+  border-color: #dc2626;
+  background-color: #fef2f2;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #4fd1c5;
+  box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.1);
+}
+
+.form-group input.invalid:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
 .todo-view {
@@ -407,7 +618,7 @@ body {
   .todo-view {
     padding: 1rem;
   }
-  
+
   .todo-grid {
     grid-template-columns: 1fr;
   }

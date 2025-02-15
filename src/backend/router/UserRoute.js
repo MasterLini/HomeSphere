@@ -1,21 +1,26 @@
-// src/backend/router/UserRoute.js
 const express = require('express');
 const router = express.Router();
-const { ObjectId } = require('mongodb');
-const UserModel = require('../models/User');
-const { getDB } = require('../db/connectDB');
-const getUserIdByToken = require('../middleware/getUserIdByToken');
-const authMiddleware = require('../middleware/authMiddleware');
-
+const { 
+    getAllUsers,
+    getUsersByFamilyId,
+    getUserById,
+    updateUserById 
+} = require('../utils/dbUtils');
+const { 
+    sendSuccess,
+    sendServerError,
+    sendNotFoundError,
+    sendValidationError 
+} = require('../utils/responseUtils');
+const { isValidObjectId } = require('../utils/validationUtils');
 
 // Get all users
 router.get('/', async (req, res) => {
     try {
         const users = await getAllUsers();
-        res.status(200).json(users);
+        sendSuccess(res, users);
     } catch (error) {
-        console.error('Error getting users:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        sendServerError(res, error);
     }
 });
 
@@ -23,107 +28,120 @@ router.get('/', async (req, res) => {
 router.get('/family/:familyId', async (req, res) => {
     const { familyId } = req.params;
 
+    if (!isValidObjectId(familyId)) {
+        return sendValidationError(res, 'Invalid family ID format');
+    }
+
     try {
         const users = await getUsersByFamilyId(familyId);
-        res.status(200).json(users);
+        sendSuccess(res, users);
     } catch (error) {
-        console.error('Error getting users by family ID:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        sendServerError(res, error);
     }
 });
 
-// Get authenticated user info using token
-router.get('/me', authMiddleware, async (req, res) => {
+// Get authenticated user info
+router.get('/me', async (req, res) => {
     try {
-        const db = getDB();
-        // Use the 'id' property from req.user (set in auth middleware)
-        const { id } = req.user;
-        if (!id) {
-            return res.status(401).json({ error: 'No authenticated user found' });
-        }
-        const user = await db.collection('users').findOne({ _id: new ObjectId(id) });
+        const { userId } = req.user;
+        const user = await getUserById(userId);
+
         if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+            return sendNotFoundError(res, 'User not found');
         }
-        res.status(200).json(user);
+
+        sendSuccess(res, user);
     } catch (error) {
-        console.error('Error fetching user info:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        sendServerError(res, error);
     }
 });
 
-// Edit user by token
-router.put('/me', getUserIdByToken, async (req, res) => {
-    const userId = req.userId;
-    const { username, email, password, familyId } = req.body;
-
+// Update authenticated user
+router.put('/me', async (req, res) => {
     try {
-        const updatedUser = await updateUserById(userId, { username, email, password, familyId });
+        const { userId } = req.user;
+        const { username, email, password, familyId } = req.body;
+
+        if (familyId && !isValidObjectId(familyId)) {
+            return sendValidationError(res, 'Invalid family ID format');
+        }
+
+        const updatedUser = await updateUserById(userId, { 
+            username, 
+            email, 
+            password, 
+            familyId: familyId ? new ObjectId(familyId) : undefined 
+        });
+
         if (!updatedUser) {
-            return res.status(404).json({ error: 'User not found' });
+            return sendNotFoundError(res, 'User not found');
         }
-        res.status(200).json(updatedUser);
+
+        sendSuccess(res, updatedUser);
     } catch (error) {
-        console.error('Error updating user:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        sendServerError(res, error);
     }
 });
 
-async function getAllUsers() {
-    const userCollection = getDB().collection('users');
+// Search users
+router.get('/search', async (req, res) => {
     try {
-        const users = await userCollection.find({}).toArray();
-        return users;
+        const { q } = req.query;
+        const users = await getAllUsers();
+        const filteredUsers = users.filter(user => 
+            user.username.toLowerCase().includes(q.toLowerCase()) ||
+            (user.name && user.name.toLowerCase().includes(q.toLowerCase()))
+        );
+        sendSuccess(res, filteredUsers);
     } catch (error) {
-        console.error('Error retrieving users from database:', error);
-        throw error;
+        sendServerError(res, error);
     }
-}
+});
 
-async function getUsersByFamilyId(familyId) {
-    const userCollection = getDB().collection('users');
+// Update user password
+router.put('/me/password', async (req, res) => {
     try {
-        const users = await userCollection.find({ familyId: new ObjectId(familyId) }).toArray();
-        return users;
-    } catch (error) {
-        console.error('Error retrieving users by family ID from database:', error);
-        throw error;
-    }
-}
+        const { userId } = req.user;
+        const { currentPassword, newPassword } = req.body;
 
-async function getUserById(userId) {
-    const userCollection = getDB().collection('users');
-    try {
-        const user = await userCollection.findOne({ _id: new ObjectId(userId) });
-        return user;
-    } catch (error) {
-        console.error('Error retrieving user from database:', error);
-        throw error;
-    }
-}
-
-async function updateUserById(userId, updateData) {
-    const userCollection = getDB().collection('users');
-    try {
-        const user = await userCollection.findOne({ _id: new ObjectId(userId) });
-        if (!user) return null;
-
-        if (updateData.password) {
-            const userModel = new UserModel(user.username, user.email, updateData.password);
-            await userModel.hashPassword();
-            updateData.password = userModel.password;
+        if (!currentPassword || !newPassword) {
+            return sendValidationError(res, 'Both current and new passwords are required');
         }
 
-        await userCollection.updateOne(
-            { _id: new ObjectId(userId) },
-            { $set: updateData }
-        );
+        const user = await getUserById(userId);
+        if (!user) {
+            return sendNotFoundError(res, 'User not found');
+        }
 
-        return await userCollection.findOne({ _id: new ObjectId(userId) });
+        // Add password validation logic here
+        const updatedUser = await updateUserById(userId, { password: newPassword });
+        sendSuccess(res, { message: 'Password updated successfully' });
     } catch (error) {
-        console.error('Error updating user in database:', error);
-        throw error;
+        sendServerError(res, error);
     }
-}
+});
+
+// Upload profile image
+router.post('/me/profile-image', async (req, res) => {
+    try {
+        const { userId } = req.user;
+        if (!req.files || !req.files.image) {
+            return sendValidationError(res, 'No image file uploaded');
+        }
+
+        const imageFile = req.files.image;
+        const uploadPath = `uploads/profile-images/${userId}_${Date.now()}_${imageFile.name}`;
+
+        await imageFile.mv(uploadPath);
+        const updatedUser = await updateUserById(userId, { profileImage: uploadPath });
+
+        sendSuccess(res, { 
+            message: 'Profile image uploaded successfully',
+            imageUrl: uploadPath 
+        });
+    } catch (error) {
+        sendServerError(res, error);
+    }
+});
 
 module.exports = router;

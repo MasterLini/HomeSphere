@@ -34,9 +34,13 @@
         </button>
       </div>
     </div>
-    <button type="submit" class="submit-btn">
-      <span class="btn-icon">✨</span>
-      Sign In
+    <div v-if="error" class="error-message">
+      {{ error }}
+    </div>
+    <button type="submit" class="submit-btn" :disabled="isLoading">
+      <span v-if="isLoading" class="loading-spinner">🔄</span>
+      <span v-else class="btn-icon">✨</span>
+      {{ isLoading ? 'Signing In...' : 'Sign In' }}
     </button>
     <p class="sign-in-text">
       Don't have an account? <a href="#" @click.prevent="$emit('switch')">Sign up here</a>
@@ -45,8 +49,7 @@
 </template>
 
 <script>
-import axios from 'axios';
-const backendUrl = `http://${process.env.VUE_APP_SERVER_IP}:${process.env.VUE_APP_SERVER_PORT}`;
+import { login } from '@/api/auth';
 
 export default {
   name: 'LoginForm',
@@ -56,19 +59,24 @@ export default {
         email: '',
         password: ''
       },
-      showPassword: false
+      showPassword: false,
+      isLoading: false,
+      error: null
     }
   },
   methods: {
     async handleLogin() {
+      this.error = null;
+      this.isLoading = true;
+
       try {
-        const response = await axios.post(`${backendUrl}/auth/login`, this.loginForm);
-        const { token } = response.data;
-        localStorage.setItem('token', token);
+        await login(this.loginForm);
         this.$router.push({ name: 'home' });
       } catch (error) {
         console.error('Login failed:', error);
-        alert('Login failed. Please check your credentials and try again.');
+        this.error = error.response?.data?.message || 'Login failed. Please check your credentials and try again.';
+      } finally {
+        this.isLoading = false;
       }
     }
   }
@@ -189,5 +197,36 @@ input:focus {
 
 .sign-in-text a:hover {
   text-decoration: underline;
+}
+
+.error-message {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 0.9em;
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  font-size: 1.2em;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.submit-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.submit-btn:disabled:hover {
+  background-color: #9ca3af;
+  transform: none;
 }
 </style>

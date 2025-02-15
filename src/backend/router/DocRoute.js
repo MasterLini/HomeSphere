@@ -1,13 +1,30 @@
 const express = require('express');
-const path = require('path');
+const swaggerUi = require('swagger-ui-express');
 const router = express.Router();
 
-// Serve static files for API documentation
-router.use('/api', express.static(path.join(__dirname, '../public/api')));
+// Load Swagger documentation
+const swaggerDocument = require('../docs/swagger.json');
 
-// Serve the main HTML file
-router.get('/api', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/api/index.html'));
+// Configure Swagger UI options
+const options = {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: "HomeSphere API Documentation",
+    swaggerOptions: {
+        persistAuthorization: true,
+        docExpansion: 'none',
+        filter: true,
+        tagsSorter: 'alpha',
+        defaultModelsExpandDepth: 3
+    }
+};
+
+// Serve Swagger UI
+router.use('/', swaggerUi.serve);
+router.get('/', swaggerUi.setup(swaggerDocument, options));
+
+// Serve raw documentation JSON
+router.get('/json', (req, res) => {
+    res.json(swaggerDocument);
 });
 
 module.exports = router;

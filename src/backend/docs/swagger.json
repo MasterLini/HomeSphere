@@ -1,0 +1,1830 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "HomeSphere API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "User's unique identifier"
+          },
+          "username": {
+            "type": "string",
+            "description": "User's username",
+            "minLength": 3,
+            "maxLength": 30
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User's email address"
+          },
+          "isVerified": {
+            "type": "boolean",
+            "description": "Email verification status"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["user", "admin"],
+            "description": "User's role"
+          },
+          "familyId": {
+            "type": "string",
+            "description": "ID of the family the user belongs to",
+            "nullable": true
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": ["username", "email", "password"],
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 30
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "description": "Password must contain at least 8 characters, including uppercase, lowercase, number, and special character"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" },
+          "code": { "type": "string" },
+          "error": { "type": "string" }
+        }
+      },
+      "FamilyMember": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "role": {
+            "type": "string",
+            "enum": ["admin", "parent", "child", "guest"]
+          },
+          "joinedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TodoItem": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "text": { "type": "string" },
+          "description": { "type": "string" },
+          "date": { 
+            "type": "string",
+            "format": "date-time"
+          },
+          "responsibilities": { "type": "string" }
+        }
+      },
+      "ShoppingItem": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "productName": { "type": "string" },
+          "quantity": { "type": "number" }
+        }
+      },
+      "List": {
+        "type": "object",
+        "required": ["userId", "type", "items"],
+        "properties": {
+          "_id": { 
+            "type": "string",
+            "description": "Unique identifier for the list"
+          },
+          "userId": { 
+            "type": "string",
+            "description": "ID of the user who owns the list"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["todolist", "shoppinglist"],
+            "description": "Type of list (todo list or shopping list)"
+          },
+          "items": {
+            "type": "array",
+            "description": "Items in the list",
+            "items": {
+              "oneOf": [
+                { "$ref": "#/components/schemas/TodoItem" },
+                { "$ref": "#/components/schemas/ShoppingItem" }
+              ]
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the list was created"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the list was last updated"
+          }
+        }
+      },
+      "ListResponse": {
+        "type": "object",
+        "properties": {
+          "lists": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/List"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of lists"
+          }
+        }
+      },
+      "Family": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "name": { 
+            "type": "string",
+            "minLength": 1
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "userId": { "type": "string" },
+                "role": {
+                  "type": "string",
+                  "enum": ["admin", "parent", "child", "guest"]
+                },
+                "joinedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "userId": { "type": "string" },
+                    "username": { "type": "string" },
+                    "requiresVerification": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Authenticate user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "token": { "type": "string" },
+                    "user": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Invalid email or password",
+                  "code": "AUTH_FAILED"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Email not verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Please verify your email before logging in",
+                  "code": "EMAIL_NOT_VERIFIED"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/verify/{token}": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Verify email address",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Email verification token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Email verification successful! You can now log in."
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "VERIFICATION_SUCCESS"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "Verification token expired. A new verification email has been sent.",
+                  "code": "TOKEN_EXPIRED"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Request password reset",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "If an account exists with this email, you will receive a password reset link."
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "RESET_EMAIL_SENT"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/reset-password/{token}": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Reset password",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Password reset token"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["password"],
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "description": "New password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Password has been reset successfully. Please log in with your new password."
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "PASSWORD_RESET_SUCCESS"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid token or password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logout user",
+        "description": "Invalidates the user's JWT token",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully logged out"
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "LOGOUT_SUCCESS"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "message": "No token provided",
+                  "code": "NO_TOKEN"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Family": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "description": "Family's unique identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Family name",
+          "minLength": 1
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "type": "string",
+                "description": "Member's user ID"
+              },
+              "role": {
+                "type": "string",
+                "enum": ["admin", "parent", "child", "guest"],
+                "description": "Member's role in the family"
+              },
+              "joinedAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "When the member joined the family"
+              }
+            }
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the family was created"
+        }
+      }
+    }
+  },
+  "paths": {
+    "/family/create": {
+      "post": {
+        "tags": ["Family"],
+        "summary": "Create family",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "members"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Smith Family"
+                  },
+                  "members": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "userId": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": ["admin", "parent", "child", "guest"]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Family"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/family/{id}/members": {
+      "get": {
+        "tags": ["Family"],
+        "summary": "Get family members",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Family ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Members list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FamilyMember"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Family not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Family"],
+        "summary": "Add family member",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Family ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId", "role"],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["admin", "parent", "child", "guest"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Family"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/family/{id}/members/{memberId}": {
+      "delete": {
+        "tags": ["Family"],
+        "summary": "Remove family member",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Family ID"
+          },
+          {
+            "in": "path",
+            "name": "memberId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Member ID to remove"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Family"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/family/{id}/members/{memberId}/promote": {
+      "patch": {
+        "tags": ["Family"],
+        "summary": "Promote member",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Family ID"
+          },
+          {
+            "in": "path",
+            "name": "memberId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Member ID to promote"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["newRole"],
+                "properties": {
+                  "newRole": {
+                    "type": "string",
+                    "enum": ["admin", "parent"],
+                    "description": "New role for the member"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Family"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lists": {
+      "post": {
+        "tags": ["Lists"],
+        "summary": "Create a new list",
+        "description": "Create a new todo list or shopping list",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/List"
+              },
+              "example": {
+                "type": "todolist",
+                "items": [
+                  {
+                    "text": "Buy groceries",
+                    "description": "Get items for dinner",
+                    "date": "2024-02-20T18:00:00Z"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "List created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "listId": { "type": "string" },
+                    "list": { "$ref": "#/components/schemas/List" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Lists"],
+        "summary": "Get lists",
+        "description": "Retrieve lists with optional filtering",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "userId",
+            "schema": { "type": "string" },
+            "description": "Filter lists by user ID"
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string",
+              "enum": ["todolist", "shoppinglist"]
+            },
+            "description": "Filter lists by type"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10
+            },
+            "description": "Number of lists to return"
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": "Number of lists to skip"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "string",
+              "enum": ["createdAt", "-createdAt", "updatedAt", "-updatedAt"],
+              "default": "-createdAt"
+            },
+            "description": "Sort order (prefix with - for descending)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lists retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ListResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lists/{listId}": {
+      "patch": {
+        "tags": ["Lists"],
+        "summary": "Update a list or its items",
+        "description": "Update list properties or modify items within the list",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "listId",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID of the list to update"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["todolist", "shoppinglist"],
+                    "description": "Change list type"
+                  },
+                  "items": {
+                    "type": "array",
+                    "description": "Updated items (only specified fields will be updated)",
+                    "items": {
+                      "type": "object",
+                      "required": ["id"],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Item ID to update"
+                        },
+                        "text": {
+                          "type": "string",
+                          "description": "New text for todo item"
+                        },
+                        "description": {
+                          "type": "string",
+                          "description": "New description for todo item"
+                        },
+                        "date": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "New due date for todo item"
+                        },
+                        "productName": {
+                          "type": "string",
+                          "description": "New product name for shopping item"
+                        },
+                        "quantity": {
+                          "type": "number",
+                          "description": "New quantity for shopping item"
+                        },
+                        "completed": {
+                          "type": "boolean",
+                          "description": "Mark item as completed/uncompleted"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "examples": {
+                "Update Todo Item": {
+                  "value": {
+                    "items": [{
+                      "id": "123",
+                      "text": "Updated task",
+                      "description": "New description",
+                      "completed": true
+                    }]
+                  }
+                },
+                "Update Shopping Item": {
+                  "value": {
+                    "items": [{
+                      "id": "456",
+                      "productName": "New product",
+                      "quantity": 5
+                    }]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "list": { "$ref": "#/components/schemas/List" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "List or item not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Lists"],
+        "summary": "Delete a list or item",
+        "description": "Delete an entire list or a specific item from a list",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "listId",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID of the list"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string",
+                    "description": "ID of the item to remove (if not provided, entire list will be deleted)"
+                  }
+                }
+              },
+              "example": {
+                "itemId": "123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Delete operation successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "deletedId": { 
+                      "type": "string",
+                      "description": "ID of the deleted list or item"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "List or item not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get all users",
+        "description": "Retrieve a list of all users (admin only)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10
+            },
+            "description": "Number of users to return"
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": "Number of users to skip"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Admin access required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get current user profile",
+        "description": "Retrieve the profile of the authenticated user",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Users"],
+        "summary": "Update current user profile",
+        "description": "Update the profile of the authenticated user",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 30,
+                    "description": "New username"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "New email address"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "description": "New password"
+                  },
+                  "familyId": {
+                    "type": "string",
+                    "description": "ID of the family to join"
+                  }
+                }
+              },
+              "example": {
+                "username": "john_doe_updated",
+                "email": "john.new@example.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/family/{familyId}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get users by family",
+        "description": "Retrieve all users belonging to a specific family",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "familyId",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID of the family"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid family ID",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Must be a member of the family",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/family/create": {
+      "post": {
+        "tags": ["Family"],
+        "summary": "Create a new family",
+        "description": "Create a new family group and set initial members",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "members"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Name of the family"
+                  },
+                  "members": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["userId", "role"],
+                      "properties": {
+                        "userId": {
+                          "type": "string",
+                          "description": "User ID to add as member"
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": ["admin", "parent", "child", "guest"],
+                          "description": "Role in the family"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "name": "Smith Family",
+                "members": [
+                  {
+                    "userId": "123",
+                    "role": "admin"
+                  },
+                  {
+                    "userId": "456",
+                    "role": "child"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Family created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Family"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/family/{id}/members": {
+      "get": {
+        "tags": ["Family"],
+        "summary": "Get family members",
+        "description": "Retrieve all members of a family",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Family ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Members retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "userId": { "type": "string" },
+                      "username": { "type": "string" },
+                      "role": {
+                        "type": "string",
+                        "enum": ["admin", "parent", "child", "guest"]
+                      },
+                      "joinedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Family not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Family"],
+        "summary": "Add family member",
+        "description": "Add a new member to the family",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Family ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId", "role"],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "User ID to add"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["admin", "parent", "child", "guest"],
+                    "description": "Role in the family"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Member added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Family"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Family not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/family/{id}/members/{memberId}": {
+      "delete": {
+        "tags": ["Family"],
+        "summary": "Remove family member",
+        "description": "Remove a member from the family",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Family ID"
+          },
+          {
+            "in": "path",
+            "name": "memberId",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Member ID to remove"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Member removed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Family"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Family or member not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/family/{id}/members/{memberId}/promote": {
+      "patch": {
+        "tags": ["Family"],
+        "summary": "Promote family member",
+        "description": "Promote a member to a higher role",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Family ID"
+          },
+          {
+            "in": "path",
+            "name": "memberId",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Member ID to promote"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["newRole"],
+                "properties": {
+                  "newRole": {
+                    "type": "string",
+                    "enum": ["admin", "parent"],
+                    "description": "New role for the member"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Member promoted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Family"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Family or member not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/family/{id}/members/{memberId}/demote": {
+      "patch": {
+        "tags": ["Family"],
+        "summary": "Demote family member",
+        "description": "Demote a member to a lower role (requires admin privileges)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Family ID"
+          },
+          {
+            "in": "path",
+            "name": "memberId",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Member ID to demote"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["newRole"],
+                "properties": {
+                  "newRole": {
+                    "type": "string",
+                    "enum": ["parent", "child", "guest"],
+                    "description": "New role for the member"
+                  }
+                }
+              },
+              "example": {
+                "newRole": "child"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Member demoted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Family"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid role",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient privileges",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Family or member not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,21 +1,57 @@
 <template>
   <div class="background">
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-spinner">Loading...</div>
+    </div>
+
+    <div v-if="error" class="error-message">{{ error }}</div>
+    <div v-if="success" class="success-message">{{ success }}</div>
+
     <!-- Left Top Container -->
     <div class="left-top-container">
       <div class="visible-container">
-        <button class="change-button">Bearbeiten</button>
+        <button class="change-button" @click="isEditing = !isEditing">
+          {{ isEditing ? 'Save' : 'Edit' }}
+        </button>
         <div class="lefttop-left">
           <div class="profile">
             <img
               class="profile-image"
-              src="https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-980x653.jpg"
+              :src="user?.profileImage || 'default-profile.png'"
               alt="Profile Picture"
+            />
+            <input
+              v-if="isEditing"
+              type="file"
+              accept="image/*"
+              @change="handleProfileImageUpload"
+              class="profile-image-input"
             />
           </div>
         </div>
-        <div class="lefttop-right">
-          <h1>Mustermann</h1>
-          <h2>Max</h2>
+        <div class="lefttop-right" v-if="!isEditing">
+          <h1>{{ user?.lastName || 'No Last Name' }}</h1>
+          <h2>{{ user?.firstName || 'No First Name' }}</h2>
+        </div>
+        <div v-else class="lefttop-right edit-form">
+          <input
+            v-model="editedProfile.firstName"
+            placeholder="First Name"
+            class="edit-input"
+          />
+          <input
+            v-model="editedProfile.lastName"
+            placeholder="Last Name"
+            class="edit-input"
+          />
+          <input
+            v-model="editedProfile.email"
+            placeholder="Email"
+            class="edit-input"
+          />
+          <button @click="updateProfile" class="save-button">
+            Save Profile
+          </button>
         </div>
       </div>
     </div>
@@ -109,68 +145,252 @@
 </template>
 
 <script>
+import {
+  getUserInfo,
+  updateUserProfile,
+  updateUserPassword,
+  uploadProfileImage,
+  getFamilyMembers,
+  addFamilyMember,
+  updateFamilyMemberRole,
+  removeFamilyMember,
+  searchUsers
+} from '@/api/user';
+
 export default {
+  name: 'UserView',
   data() {
     return {
-      familyMembers: [], // For family members table
-      allUsers: [], // For all users table
-      searchQuery: '', // For search bar
+      // User data
+      user: null,
+      profileImage: null,
+
+      // Family data
+      familyMembers: [],
+      allUsers: [],
+
+      // Search
+      searchQuery: '',
+
+      // Edit state
+      isEditing: false,
+      editedProfile: {
+        username: '',
+        email: '',
+        firstName: '',
+        lastName: ''
+      },
+
+      // Password change
+      passwordData: {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      },
+
+      // UI state
+      loading: false,
+      error: null,
+      success: null,
+
+      // Role options
+      roleOptions: [
+        { value: 'admin', label: 'Admin' },
+        { value: 'parent', label: 'Parent' },
+        { value: 'child', label: 'Child' },
+        { value: 'guest', label: 'Guest' }
+      ]
+    }
+  },
+
+  async mounted() {
+    try {
+      this.loading = true;
+      console.log('[DEBUG] Initializing UserView');
+
+      // Get user info
+      const userData = await getUserInfo();
+      this.user = userData;
+      this.editedProfile = {
+        username: userData.username,
+        email: userData.email,
+        firstName: userData.firstName || '',
+        lastName: userData.lastName || ''
+      };
+
+      // Load initial data
+      await Promise.all([
+        this.loadFamilyMembers(),
+        this.searchAllUsers()
+      ]);
+    } catch (error) {
+      console.error('[DEBUG] Error initializing UserView:', error);
+      this.error = 'Failed to load user profile. Please try again.';
+    } finally {
+      this.loading = false;
+    }
+  },
+
+  watch: {
+    searchQuery: {
+      handler: 'searchAllUsers',
+      debounce: 300
+    },
+    'user.familyId': {
+      handler: 'loadFamilyMembers',
+      immediate: true
     }
   },
 
   computed: {
+    fullName() {
+      if (!this.user) return '';
+      return `${this.user.firstName || ''} ${this.user.lastName || ''}`.trim() || 'No name set';
+    },
+
+    userRole() {
+      return this.user?.role || 'user';
+    },
+
+    isAdmin() {
+      return this.userRole === 'admin';
+    },
+
+    canManageFamily() {
+      return ['admin', 'parent'].includes(this.userRole);
+    },
+
     filteredUsers() {
-      return this.allUsers.filter(user => {
-        const searchLower = this.searchQuery.toLowerCase()
-        return user.username.toLowerCase().includes(searchLower) ||
-               user.name.toLowerCase().includes(searchLower)
-      })
+      if (!this.searchQuery) return this.allUsers;
+      const query = this.searchQuery.toLowerCase();
+      return this.allUsers.filter(user => 
+        (user.firstName?.toLowerCase().includes(query)) ||
+        (user.lastName?.toLowerCase().includes(query)) ||
+        user.username.toLowerCase().includes(query) ||
+        user.email.toLowerCase().includes(query)
+      );
     }
   },
 
   methods: {
-    async fetchUsers() {
+    async searchAllUsers() {
       try {
-        const response = await fetch('http://localhost:3000/users')
-        if (!response.ok) {
-          throw new Error('Failed to fetch users')
-        }
-        this.allUsers = await response.json()
+        this.loading = true;
+        const users = await searchUsers(this.searchQuery);
+        this.allUsers = users;
       } catch (error) {
-        console.error('Error fetching users:', error)
+        console.error('[DEBUG] Error searching users:', error);
+        this.error = 'Failed to search users. Please try again.';
+      } finally {
+        this.loading = false;
       }
     },
 
-    async fetchFamilyMembers() {
+    async loadFamilyMembers() {
       try {
-        // Assuming we have the family ID stored somewhere
-        const familyId = localStorage.getItem('familyId') 
-        if (!familyId) return
-
-        const response = await fetch(`http://localhost:3000/family/${familyId}/members`)
-        if (!response.ok) {
-          throw new Error('Failed to fetch family members')
+        this.loading = true;
+        const familyId = this.user?.familyId;
+        if (!familyId) {
+          console.warn('[DEBUG] No family ID available');
+          return;
         }
-        this.familyMembers = await response.json()
+        const members = await getFamilyMembers(familyId);
+        this.familyMembers = members;
       } catch (error) {
-        console.error('Error fetching family members:', error)
+        console.error('[DEBUG] Error loading family members:', error);
+        this.error = 'Failed to load family members. Please try again.';
+      } finally {
+        this.loading = false;
       }
     },
 
     async changeRole(userId) {
-      // TODO: Implement role change functionality
-      console.log('Change role for user:', userId)
+      try {
+        this.loading = true;
+        const newRole = prompt('Enter new role (admin/parent/child/guest):');
+        if (!newRole) return;
+
+        await updateFamilyMemberRole(userId, newRole);
+        await this.loadFamilyMembers();
+        this.success = 'Role updated successfully';
+      } catch (error) {
+        console.error('[DEBUG] Error changing role:', error);
+        this.error = 'Failed to change role. Please try again.';
+      } finally {
+        this.loading = false;
+      }
     },
 
     async removeMember(userId) {
-      // TODO: Implement member removal functionality  
-      console.log('Remove member:', userId)
-    }
-  },
+      try {
+        if (!confirm('Are you sure you want to remove this member?')) return;
 
-  mounted() {
-    this.fetchUsers()
-    this.fetchFamilyMembers()
+        this.loading = true;
+        await removeFamilyMember(userId);
+        await this.loadFamilyMembers();
+        this.success = 'Member removed successfully';
+      } catch (error) {
+        console.error('[DEBUG] Error removing member:', error);
+        this.error = 'Failed to remove member. Please try again.';
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async updateProfile() {
+      try {
+        this.loading = true;
+        await updateUserProfile(this.editedProfile);
+        this.user = await getUserInfo();
+        this.isEditing = false;
+        this.success = 'Profile updated successfully';
+      } catch (error) {
+        console.error('[DEBUG] Error updating profile:', error);
+        this.error = 'Failed to update profile. Please try again.';
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async updatePassword() {
+      try {
+        if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
+          this.error = 'New passwords do not match';
+          return;
+        }
+
+        this.loading = true;
+        await updateUserPassword(this.passwordData);
+        this.passwordData = {
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        };
+        this.success = 'Password updated successfully';
+      } catch (error) {
+        console.error('[DEBUG] Error updating password:', error);
+        this.error = 'Failed to update password. Please try again.';
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async handleProfileImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        this.loading = true;
+        await uploadProfileImage(file);
+        this.user = await getUserInfo();
+        this.success = 'Profile image updated successfully';
+      } catch (error) {
+        console.error('[DEBUG] Error uploading profile image:', error);
+        this.error = 'Failed to upload profile image. Please try again.';
+      } finally {
+        this.loading = false;
+      }
+    }
   }
 }
 
@@ -184,6 +404,133 @@ export default {
       width: calc(100% - 80px);
       height: 100%;
       background-color: var(--background-color);
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .loading-spinner {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .error-message, .success-message {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 4px;
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .error-message {
+      background: #ff4444;
+      color: white;
+    }
+
+    .success-message {
+      background: #44ff44;
+      color: black;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+
+    .profile {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .profile-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-image-input {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 8px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .edit-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .edit-input {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .edit-input:focus {
+      border-color: #4CAF50;
+      outline: none;
+    }
+
+    .save-button {
+      padding: 10px 20px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    .save-button:hover {
+      background: #45a049;
+    }
+
+    .change-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 8px 16px;
+      background: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    .change-button:hover {
+      background: #1976D2;
     }
 
     .left-top-container, .left-bottom-container, .right-container {

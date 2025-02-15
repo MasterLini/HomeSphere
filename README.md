@@ -88,3 +88,130 @@ HomeSphere is not intended to be:
 ---
 
 HomeSphere is designed to simplify household management while offering flexibility and robust functionality for modern families. Enjoy a more organized, collaborative, and connected home experience with HomeSphere!
+
+## Technical Stack
+
+- **Backend:** Node.js with Express.js
+- **Frontend:** Web-based interface
+- **Database:** TBD
+- **AI Integration:** Rasa for chatbot functionality
+- **External Services:**
+  - iCloud Calendar integration
+  - Open EAN/GTIN Database for barcode scanning
+
+## Prerequisites
+
+- Node.js (v14 or higher)
+- npm (Node Package Manager)
+- Git
+
+## Getting Started
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/MasterLini/HomeSphere.git
+   cd HomeSphere
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm start
+   ```
+
+## Development Setup
+
+1. Ensure you have all prerequisites installed
+2. Fork the repository
+3. Create a new branch for your feature
+4. Make your changes
+5. Submit a pull request
+
+## Contributing
+
+We welcome contributions to HomeSphere! Please follow these steps:
+
+1. Check the issue tracker for open issues
+2. Discuss major changes in an issue before starting
+3. Follow the coding style of the project
+4. Write clear commit messages
+5. Submit a pull request with a clear description of changes
+
+## License
+
+This project is private and proprietary. All rights reserved.
+
+# HomeSphere User Management
+
+## Features
+
+### User Profile Management
+- View and edit user profile information
+- Upload profile images
+- Update password
+- Real-time validation and error handling
+
+### Family Management
+- View family members
+- Add new family members
+- Change member roles (admin/parent/child/guest)
+- Remove family members
+- Role-based access control
+
+### User Search
+- Search users by name or username
+- Real-time search results
+- Add users to family
+
+## API Endpoints
+
+### User Management
+- GET /users/me - Get authenticated user info
+- PUT /users/me - Update user profile
+- PUT /users/me/password - Update user password
+- POST /users/me/profile-image - Upload profile image
+- GET /users/search - Search users
+
+### Family Management
+- GET /users/family/:familyId - Get family members
+- POST /family/members - Add family member
+- PUT /family/members/:userId/role - Update member role
+- DELETE /family/members/:userId - Remove family member
+
+## Setup and Usage
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Start the backend server:
+```bash
+cd src/backend
+npm start
+```
+
+3. Start the frontend development server:
+```bash
+cd src/interface_page
+npm run serve
+```
+
+4. Access the application at http://localhost:8080
+
+## Error Handling
+- Loading states for all operations
+- Error messages for failed operations
+- Success notifications
+- Input validation
+- Role-based access control
+
+## Technologies Used
+- Vue.js for frontend
+- Express.js for backend
+- MongoDB for database
+- JWT for authentication
