@@ -2,6 +2,7 @@
   <div class="auth-container">
     <div class="auth-card">
       <div class="card-content">
+        <button class="btn btn-lg text-center" @click="goHome"><span><i class="bi bi-arrow-left"></i></span></button>
         <h1 class="title">✨ Join Us!</h1>
 
         <div class="tabs">
@@ -46,6 +47,7 @@
 <script>
 import LoginForm from '@/components/auth/LoginForm.vue'
 import RegisterForm from '@/components/auth/RegisterForm.vue'
+import router from '@/router';
 
 export default {
   name: 'AuthView',
@@ -69,6 +71,9 @@ export default {
       setTimeout(() => {
         this.showBanner = false;
       }, 5000); // Hide banner after 5 seconds
+    },
+    goHome() {
+      router.push({path: 'home'})
     }
   }
 }
