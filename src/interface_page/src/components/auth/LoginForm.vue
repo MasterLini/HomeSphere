@@ -85,16 +85,16 @@ export default {
 
 <style scoped>
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: clamp(1rem, 3vw, 1.25rem);
 }
 
 label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
   color: #4a5568;
-  font-size: 0.9em;
+  font-size: clamp(0.875rem, 2.5vw, 0.9rem);
 }
 
 .label-icon {
@@ -108,23 +108,25 @@ label {
 }
 
 .password-input input {
-  padding-right: 40px;
+  padding-right: 2.5rem;
 }
 
 .password-toggle {
   position: absolute;
-  right: 12px;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
-  padding: 4px;
+  padding: 0.5rem;
   color: #4a5568;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: color 0.2s ease;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
 }
 
 .password-toggle:hover {
@@ -132,15 +134,15 @@ label {
 }
 
 .password-toggle .mdi {
-  font-size: 20px;
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
 }
 
 input {
   width: 100%;
-  padding: 12px 16px;
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(0.75rem, 2vw, 1rem);
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 1em;
+  border-radius: 0.75rem;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
   transition: all 0.2s ease;
   background-color: #fff9db;
 }
@@ -152,25 +154,26 @@ input::placeholder {
 input:focus {
   outline: none;
   border-color: #4fd1c5;
-  box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.1);
+  box-shadow: 0 0 0 0.1875rem rgba(79, 209, 197, 0.1);
 }
 
 .submit-btn {
   width: 100%;
-  padding: 12px;
+  padding: clamp(0.75rem, 2vw, 1rem);
   background-color: #4fd1c5;
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 1em;
+  border-radius: 0.75rem;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin-top: 24px;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  min-height: 3rem;
 }
 
 .submit-btn:hover {
@@ -184,8 +187,8 @@ input:focus {
 
 .sign-in-text {
   text-align: center;
-  margin-top: 16px;
-  font-size: 0.9em;
+  margin-top: 1rem;
+  font-size: clamp(0.875rem, 2.5vw, 0.9rem);
   color: #4a5568;
 }
 
@@ -193,6 +196,7 @@ input:focus {
   color: #38b2ac;
   text-decoration: none;
   font-weight: 500;
+  padding: 0.25rem;
 }
 
 .sign-in-text a:hover {
@@ -202,10 +206,26 @@ input:focus {
 .error-message {
   background-color: #fee2e2;
   color: #dc2626;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  font-size: 0.9em;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: clamp(0.875rem, 2.5vw, 0.9rem);
+}
+
+@media (max-width: 480px) {
+  input, .submit-btn {
+    padding: 0.75rem;
+  }
+
+  .password-toggle {
+    right: 0.5rem;
+    min-width: 2rem;
+    min-height: 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
 }
 
 .loading-spinner {

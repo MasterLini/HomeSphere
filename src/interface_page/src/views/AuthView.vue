@@ -77,66 +77,76 @@ export default {
 <style scoped>
 .auth-container {
   min-height: 100vh;
+  height: auto;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   background-color: #f0f9f6;
-  padding: 20px;
+  padding: clamp(1rem, 3vw, 2rem);
   position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .auth-card {
   background: white;
-  border-radius: 24px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+  border-radius: clamp(1rem, 3vw, 1.5rem);
+  box-shadow: 0 0.25rem 1.5rem rgba(0, 0, 0, 0.05);
   width: 100%;
-  max-width: 400px;
-  overflow: hidden;
+  max-width: min(90vw, 28rem);
+  min-width: min(100%, 20rem);
+  margin: 1rem auto;
   position: relative;
+  overflow: visible;
+  height: auto;
+  min-height: min-content;
 }
 
 .card-content {
-  padding: 32px;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  overflow-y: auto;
+  max-height: calc(100vh - 4rem);
 }
 
 .title {
   text-align: center;
   color: #2c7a7b;
-  font-size: 24px;
-  margin-bottom: 24px;
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  margin-bottom: 1.5rem;
   font-weight: 600;
 }
 
 .tabs {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   background: #f0f9f6;
-  padding: 4px;
-  border-radius: 12px;
-  margin-bottom: 24px;
+  padding: 0.25rem;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
 .tab-btn {
   flex: 1;
-  padding: 12px;
+  padding: 0.75rem;
   border: none;
   background: none;
-  font-size: 1em;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
   font-weight: 500;
   color: #4a5568;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .tab-btn.active {
   background: white;
   color: #2c7a7b;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.05);
 }
 
 .form-container {
-  margin-top: 16px;
+  margin-top: 1rem;
 }
 
 .fade-enter-active,
@@ -152,15 +162,40 @@ export default {
 .alert-banner {
   background-color: #e6fffa;
   color: #2c7a7b;
-  padding: 12px;
-  border-radius: 8px;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
   text-align: center;
-  font-size: 1em;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
   font-weight: 500;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  left: 0;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.05);
+  position: fixed;
+  bottom: 1rem;
+  width: min(90%, 25rem);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    margin: 0.5rem;
+  }
+
+  .card-content {
+    padding: 1rem;
+  }
+
+  .tabs {
+    gap: 0.25rem;
+  }
+
+  .tab-btn {
+    padding: 0.5rem;
+  }
+
+  .alert-banner {
+    width: 90%;
+    bottom: 0.5rem;
+  }
 }
 </style>

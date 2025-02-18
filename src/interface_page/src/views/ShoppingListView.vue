@@ -338,6 +338,12 @@ export default {
 </script>
 
 <style scoped>
+.shoppinglist-view {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(1rem, 4vw, 2rem);
+}
+
 .loading-overlay {
   position: fixed;
   top: 0;
@@ -354,8 +360,8 @@ export default {
 
 .loading-spinner {
   animation: spin 1s linear infinite;
-  font-size: 2em;
-  margin-bottom: 1rem;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  margin-bottom: clamp(0.75rem, 2vw, 1rem);
 }
 
 @keyframes spin {
@@ -366,38 +372,45 @@ export default {
 .error-message {
   background-color: #fee2e2;
   color: #dc2626;
-  padding: 1rem;
+  padding: clamp(0.75rem, 2vw, 1rem);
   border-radius: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: clamp(0.75rem, 2vw, 1rem);
   text-align: center;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
 }
 
 .form-error {
   background-color: #fee2e2;
   color: #dc2626;
-  padding: 0.75rem;
+  padding: clamp(0.5rem, 2vw, 0.75rem);
   border-radius: 0.5rem;
-  margin-bottom: 1rem;
-  font-size: 0.9em;
+  margin-bottom: clamp(0.75rem, 2vw, 1rem);
+  font-size: clamp(0.875rem, 2.5vw, 0.9rem);
 }
 
 .page-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
+}
+
+.page-header h1 {
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  margin-bottom: 0.5rem;
 }
 
 .subtitle {
   color: var(--text-color);
   opacity: 0.8;
-  font-size: 1.1em;
+  font-size: clamp(1rem, 3vw, 1.1rem);
 }
 
 .list-input {
   width: 100%;
-  padding: 8px;
+  padding: clamp(0.5rem, 2vw, 0.75rem);
   border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-right: 10px;
+  border-radius: clamp(0.25rem, 1vw, 0.5rem);
+  margin-right: clamp(0.5rem, 2vw, 0.75rem);
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
 }
 
 .list-input.invalid {
@@ -408,36 +421,39 @@ export default {
 .list-input:focus {
   outline: none;
   border-color: #4fd1c5;
-  box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.1);
+  box-shadow: 0 0 0 0.1875rem rgba(79, 209, 197, 0.1);
 }
 
 .list-input.invalid:focus {
   border-color: #dc2626;
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  box-shadow: 0 0 0 0.1875rem rgba(220, 38, 38, 0.1);
 }
 
 .form-inline {
   display: flex;
-  gap: 1rem;
+  gap: clamp(0.5rem, 2vw, 1rem);
   align-items: center;
   flex-wrap: wrap;
 }
 
 .form-group {
   flex: 1;
-  min-width: 200px;
+  min-width: min(100%, 200px);
 }
 
 .btn {
-  padding: 8px 16px;
+  padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 3vw, 1rem);
   border: none;
-  border-radius: 4px;
+  border-radius: clamp(0.25rem, 1vw, 0.5rem);
   background-color: #4fd1c5;
   color: white;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  min-height: 2.5rem;
+  white-space: nowrap;
 }
 
 .btn:hover {
@@ -458,24 +474,28 @@ export default {
 }
 
 .shoppinglist-table {
-  margin-top: 2rem;
+  margin-top: clamp(1.5rem, 4vw, 2rem);
+  overflow-x: auto;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 600px;
 }
 
 .table th,
 .table td {
-  padding: 12px;
+  padding: clamp(0.5rem, 2vw, 0.75rem);
   text-align: left;
   border-bottom: 1px solid #e5e7eb;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
 }
 
 .table th {
   background-color: #f9fafb;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .table tr:hover {
@@ -485,15 +505,52 @@ export default {
 .table input,
 .table select {
   width: 100%;
-  padding: 8px;
+  padding: clamp(0.5rem, 2vw, 0.75rem);
   border: 1px solid #e5e7eb;
-  border-radius: 4px;
+  border-radius: clamp(0.25rem, 1vw, 0.5rem);
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
 }
 
 .table input:focus,
 .table select:focus {
   outline: none;
   border-color: #4fd1c5;
-  box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.1);
+  box-shadow: 0 0 0 0.1875rem rgba(79, 209, 197, 0.1);
+}
+
+@media (max-width: 768px) {
+  .form-inline {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-group {
+    margin-right: 0;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .shoppinglist-view {
+    padding: 0.75rem;
+  }
+
+  .list-input {
+    padding: 0.5rem;
+  }
+
+  .btn {
+    padding: 0.5rem;
+    min-height: 2.25rem;
+  }
 }
 </style>
