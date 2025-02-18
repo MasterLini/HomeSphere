@@ -113,15 +113,36 @@ HomeSphere is designed to simplify household management while offering flexibili
    cd HomeSphere
    ```
 
-2. Install dependencies:
+2. Install all dependencies (backend and frontend):
    ```bash
-   npm install
+   npm run install:all
    ```
 
-3. Start the development server:
-   ```bash
-   npm start
+3. Set up environment variables:
+   Create a `.env` file in the `src/backend` directory with the following variables:
    ```
+   MONGO_URI=your_mongodb_uri
+   DB_NAME=your_database_name
+   SECRET_KEY=your_secret_key
+   EMAIL_USER=your_email
+   EMAIL_PASS=your_email_app_password
+   DEV_EMAIL=your_dev_email
+   ```
+
+4. Start the application:
+   ```bash
+   # Production mode (both backend and frontend)
+   npm start
+
+   # Development mode with hot-reloading
+   npm run dev
+   ```
+
+The application will start with:
+- Backend server at `http://localhost:3000`
+- Frontend development server at `http://localhost:8080`
+
+You can view the application by opening `http://localhost:8080` in your browser.
 
 ## Development Setup
 

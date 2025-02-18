@@ -4,8 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js"
+    "test": "jest --detectOpenHandles",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "start": "concurrently --kill-others-on-fail --names \"BACKEND,FRONTEND\" --prefix \"[{name}]\" --prefix-colors \"cyan.bold,green.bold\" \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "node src/backend/index.js",
+    "start:frontend": "cd src/interface_page && npm start",
+    "dev": "concurrently --kill-others-on-fail --names \"BACKEND,FRONTEND\" --prefix \"[{name}]\" --prefix-colors \"cyan.bold,green.bold\" \"nodemon src/backend/index.js\" \"cd src/interface_page && npm run serve\"",
+    "install:all": "npm install && cd src/interface_page && npm install"
   },
   "repository": {
     "type": "git",
@@ -26,14 +32,9 @@
   "devDependencies": {
     "jest": "^29.5.0",
     "supertest": "^6.3.3",
-    "mongodb-memory-server": "^8.12.0"
-  },
-  "scripts": {
-    "test": "jest --detectOpenHandles",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "start": "node src/backend/index.js",
-    "dev": "nodemon src/backend/index.js"
+    "mongodb-memory-server": "^8.12.0",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.2"
   },
   "jest": {
     "testEnvironment": "node",
