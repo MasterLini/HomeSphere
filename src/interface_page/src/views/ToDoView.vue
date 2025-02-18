@@ -499,8 +499,8 @@ body {
 
 .loading-spinner {
   animation: spin 1s linear infinite;
-  font-size: 2em;
-  margin-bottom: 1rem;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  margin-bottom: clamp(0.75rem, 2vw, 1rem);
 }
 
 @keyframes spin {
@@ -511,10 +511,11 @@ body {
 .error-message {
   background-color: #fee2e2;
   color: #dc2626;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  margin-bottom: 1rem;
+  padding: clamp(0.75rem, 2vw, 1rem);
+  border-radius: clamp(0.375rem, 1vw, 0.5rem);
+  margin-bottom: clamp(0.75rem, 2vw, 1rem);
   text-align: center;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
 }
 
 .form-content.loading {
@@ -525,10 +526,10 @@ body {
 .form-error {
   background-color: #fee2e2;
   color: #dc2626;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  margin-bottom: 1rem;
-  font-size: 0.9em;
+  padding: clamp(0.5rem, 2vw, 0.75rem);
+  border-radius: clamp(0.375rem, 1vw, 0.5rem);
+  margin-bottom: clamp(0.75rem, 2vw, 1rem);
+  font-size: clamp(0.875rem, 2.5vw, 0.9rem);
 }
 
 .form-group input.invalid {
@@ -539,48 +540,54 @@ body {
 .form-group input:focus {
   outline: none;
   border-color: #4fd1c5;
-  box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.1);
+  box-shadow: 0 0 0 0.1875rem rgba(79, 209, 197, 0.1);
 }
 
 .form-group input.invalid:focus {
   border-color: #dc2626;
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  box-shadow: 0 0 0 0.1875rem rgba(220, 38, 38, 0.1);
 }
 
 .todo-view {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: clamp(1rem, 4vw, 2rem);
 }
 
 .page-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
+}
+
+.page-header h1 {
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  margin-bottom: clamp(0.5rem, 2vw, 0.75rem);
 }
 
 .subtitle {
   color: var(--text-color);
   opacity: 0.8;
-  font-size: 1.1em;
+  font-size: clamp(1rem, 3vw, 1.1rem);
 }
 
 .todo-form {
-  max-width: 800px;
-  margin: 0 auto 3rem auto;
+  max-width: min(100%, 800px);
+  margin: 0 auto clamp(2rem, 6vw, 3rem) auto;
+  padding: clamp(1rem, 3vw, 1.5rem);
 }
 
 .form-content {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: clamp(0.75rem, 2vw, 1rem);
 }
 
 .todo-input {
   width: 100%;
-  padding: 12px 16px;
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(0.75rem, 2vw, 1rem);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
-  font-size: 1rem;
+  border-radius: clamp(0.5rem, 2vw, 0.75rem);
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
   background-color: var(--input-bg);
   color: var(--text-color);
   transition: all 0.2s ease;
@@ -589,29 +596,65 @@ body {
 .todo-input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.1);
+  box-shadow: 0 0 0 0.1875rem rgba(79, 209, 197, 0.1);
 }
 
 .todo-grid {
   display: grid;
-  grid-template-columns: repeat(3,auto); 
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
   margin: 0;
   padding: 0;
-  align-items: start; 
-  justify-items: start; 
+  align-items: start;
+  width: 100%;
 }
 
 .btn {
   align-self: flex-end;
-  padding: 12px 24px;
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  min-height: 2.75rem;
+  border-radius: clamp(0.375rem, 1vw, 0.5rem);
+}
+
+@media (max-width: 768px) {
+  .todo-form {
+    padding: 1rem;
+  }
+
+  .todo-grid {
+    gap: 1rem;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .todo-view {
+    padding: 0.75rem;
+  }
+
+  .todo-input {
+    padding: 0.75rem;
+  }
+
+  .btn {
+    padding: 0.75rem;
+    min-height: 2.5rem;
+  }
 }
 
 .icon {
-  font-size: 1.2em;
+  font-size: clamp(1.1em, 3vw, 1.2em);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (max-width: 768px) {

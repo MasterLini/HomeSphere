@@ -4,7 +4,7 @@
       <h1>Welcome to HomeSphere</h1>
       <p class="subtitle">{{ this.joke }}</p>
     </div>
-    
+
     <div class="content-grid">
       <div class="card quick-actions">
         <h2>Quick Actions</h2>
@@ -74,10 +74,10 @@ export default {
       } catch (error) {
         console.error('Fehler beim Abrufen der Daten:', error);
       }
-    
+
     }
   }
-  
+
 }
 </script>
 
@@ -85,36 +85,48 @@ export default {
 .home-view {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: clamp(1rem, 4vw, 2rem);
 }
 
 .page-header {
-  margin-bottom: 2rem;
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
   text-align: center;
+}
+
+.page-header h1 {
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  margin-bottom: 0.5rem;
 }
 
 .subtitle {
   color: var(--text-color);
   opacity: 0.8;
-  font-size: 1.1em;
+  font-size: clamp(1rem, 3vw, 1.1rem);
 }
 
 .content-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: clamp(1rem, 4vw, 2rem);
+  margin-top: clamp(1rem, 4vw, 2rem);
 }
 
 .quick-actions {
   background: linear-gradient(135deg, #fff 0%, #f0f9f6 100%);
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border-radius: clamp(0.75rem, 2vw, 1rem);
+}
+
+.quick-actions h2 {
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  margin-bottom: 1rem;
 }
 
 .actions-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+  gap: clamp(0.75rem, 2vw, 1rem);
+  margin-top: clamp(0.75rem, 2vw, 1rem);
 }
 
 .action-btn {
@@ -122,12 +134,14 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
   background-color: white;
-  border-radius: 16px;
+  border-radius: clamp(0.75rem, 2vw, 1rem);
   gap: 0.5rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px var(--shadow-color);
+  min-height: 3rem;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
 }
 
 .action-btn:hover {
@@ -136,23 +150,23 @@ export default {
 }
 
 .action-btn .icon {
-  font-size: 1.5em;
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
   margin-bottom: 0.5rem;
 }
 
 .activity-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: clamp(0.75rem, 2vw, 1rem);
 }
 
 .activity-item {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
-  padding: 1rem;
+  gap: clamp(0.75rem, 2vw, 1rem);
+  padding: clamp(0.75rem, 2vw, 1rem);
   background-color: var(--background-color);
-  border-radius: 12px;
+  border-radius: clamp(0.5rem, 2vw, 0.75rem);
   transition: all 0.3s ease;
 }
 
@@ -162,10 +176,10 @@ export default {
 }
 
 .activity-icon {
-  font-size: 1.5em;
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
   background-color: white;
-  padding: 0.5rem;
-  border-radius: 12px;
+  padding: clamp(0.375rem, 1.5vw, 0.5rem);
+  border-radius: clamp(0.5rem, 2vw, 0.75rem);
   box-shadow: 0 2px 4px var(--shadow-color);
 }
 
@@ -175,7 +189,7 @@ export default {
 
 .activity-content h3 {
   margin: 0;
-  font-size: 1.1em;
+  font-size: clamp(1rem, 3vw, 1.1rem);
   font-weight: 600;
 }
 
@@ -183,21 +197,40 @@ export default {
   margin: 0.25rem 0;
   color: var(--text-color);
   opacity: 0.8;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
 }
 
 .activity-time {
-  font-size: 0.9em;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
   color: var(--text-color);
   opacity: 0.6;
 }
 
 @media (max-width: 768px) {
-  .content-grid {
-    grid-template-columns: 1fr;
+  .home-view {
+    padding: 1rem;
   }
-  
-  .actions-grid {
-    grid-template-columns: 1fr;
+
+  .content-grid {
+    gap: 1rem;
+  }
+
+  .activity-item {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .action-btn {
+    padding: 0.75rem;
+  }
+
+  .activity-icon {
+    padding: 0.375rem;
+  }
+
+  .activity-item {
+    gap: 0.75rem;
   }
 }
 </style>

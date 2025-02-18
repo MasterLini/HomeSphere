@@ -28,13 +28,81 @@
   </div>
 </template>
 <style scoped>
-h2 {
-  color: var(--primary-color)
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(1rem, 4vw, 2rem);
 }
 
-li {
-  background-color: var(--background--color);
+h1 {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  margin-bottom: clamp(1rem, 3vw, 1.5rem);
+  color: var(--primary-color);
+}
+
+h2 {
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  color: var(--primary-color);
+  margin-bottom: clamp(0.75rem, 2vw, 1rem);
+}
+
+.card {
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border-radius: clamp(0.5rem, 2vw, 0.75rem);
+  background-color: white;
+  box-shadow: 0 2px 4px var(--shadow-color);
+  margin-bottom: clamp(1rem, 3vw, 1.5rem);
+}
+
+.card p {
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+
+.list-group {
+  margin: 0;
+  padding: 0;
+}
+
+.list-group-item {
+  background-color: var(--background-color);
   text-align: left;
+  padding: clamp(0.75rem, 2vw, 1rem);
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  line-height: 1.6;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.list-group-item:last-child {
+  border-bottom: none;
+}
+
+.list-group-item strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .list-group-item {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .list-group-item strong {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+  }
 }
 </style>
 <script>
@@ -47,7 +115,7 @@ AOS.init({
   export default {
     name: 'About',
     mounted() {
-      
+
     },
     updated() {
     this.$nextTick(() => {
