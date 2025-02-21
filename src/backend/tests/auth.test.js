@@ -2,46 +2,139 @@ const request = require('supertest');
 const { MongoClient } = require('mongodb');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const jwt = require('jsonwebtoken');
-const app = require('../app');
+const MongoStore = require('connect-mongo');
+const { app, configureApp } = require('../app');
 const UserModel = require('../models/User');
 const { connectDB, disconnectDB } = require('../db/connectDB');
+const { initializeSecurity, cleanup: cleanupSecurity } = require('../utils/securityInit');
 
 let mongoServer;
 let connection;
 let db;
+let sessionStore;
+let csrfToken;
+let configuredApp;
+let testSession;
 
 beforeAll(async () => {
     // Setup MongoDB Memory Server
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
-    
+
     // Connect to in-memory database
     connection = await MongoClient.connect(mongoUri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
     });
     db = connection.db();
-    
-    // Mock environment variables
-    process.env.SECRET_KEY = 'test-secret-key';
-    process.env.NODE_ENV = 'test';
+
+    // Create session store
+    sessionStore = MongoStore.create({
+        client: connection,
+        dbName: 'test',
+        collectionName: 'sessions',
+        ttl: 24 * 60 * 60,
+        autoRemove: 'native'
+    });
+
+    // Configure session
+    const sessionConfig = {
+        secret: 'test-session-secret',
+        name: 'sessionId',
+        resave: false,
+        saveUninitialized: false,
+        store: sessionStore,
+        cookie: {
+            secure: false,
+            httpOnly: true,
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000
+        }
+    };
+
+    // Configure app with session
+    configuredApp = configureApp(sessionConfig);
+    await initializeSecurity(configuredApp, db);
+
+    // Get CSRF token
+    const response = await request(configuredApp)
+        .get('/csrf-token')
+        .set('Cookie', ['connect.sid=test-session']);
+
+    csrfToken = response.body.csrfToken;
 });
 
 afterAll(async () => {
-    await connection.close();
-    await mongoServer.stop();
+    try {
+        console.log('[DEBUG_LOG] Starting test cleanup');
+
+        // Cleanup security
+        cleanupSecurity();
+        console.log('[DEBUG_LOG] Security cleanup completed');
+
+        // Close session store
+        if (sessionStore) {
+            await sessionStore.close();
+            console.log('[DEBUG_LOG] Session store closed');
+        }
+
+        // Close database connections
+        if (connection) {
+            await connection.close();
+            console.log('[DEBUG_LOG] Database connection closed');
+        }
+
+        // Stop MongoDB server
+        if (mongoServer) {
+            await mongoServer.stop();
+            console.log('[DEBUG_LOG] MongoDB server stopped');
+        }
+
+        console.log('[DEBUG_LOG] Test cleanup completed');
+    } catch (error) {
+        console.error('[DEBUG_LOG] Test cleanup failed:', error);
+        throw error;
+    }
 });
 
 beforeEach(async () => {
-    // Clear database before each test
-    await db.collection('users').deleteMany({});
+    try {
+        console.log('[DEBUG_LOG] Starting test preparation');
+
+        // Clear database
+        await db.collection('users').deleteMany({});
+        console.log('[DEBUG_LOG] Database cleared');
+
+        // Refresh CSRF token
+        const response = await request(configuredApp)
+            .get('/csrf-token')
+            .set('Cookie', ['connect.sid=test-session']);
+
+        if (!response.body.csrfToken) {
+            throw new Error('Failed to get CSRF token');
+        }
+
+        csrfToken = response.body.csrfToken;
+        console.log('[DEBUG_LOG] CSRF token refreshed');
+
+        // Store cookies from response
+        testSession = response.headers['set-cookie'];
+        console.log('[DEBUG_LOG] Session cookie stored');
+
+        console.log('[DEBUG_LOG] Test preparation completed');
+    } catch (error) {
+        console.error('[DEBUG_LOG] Test preparation failed:', error);
+        throw error;
+    }
 });
 
 describe('Authentication Routes', () => {
     describe('POST /auth/register', () => {
         it('should register a new user successfully', async () => {
-            const response = await request(app)
+            const response = await request(configuredApp)
                 .post('/auth/register')
+                .set('Cookie', testSession)
+                .set('X-CSRF-Token', csrfToken)
                 .send({
                     username: 'testuser',
                     email: 'test@example.com',
@@ -60,8 +153,10 @@ describe('Authentication Routes', () => {
         });
 
         it('should reject registration with invalid password', async () => {
-            const response = await request(app)
+            const response = await request(configuredApp)
                 .post('/auth/register')
+                .set('Cookie', testSession)
+                .set('X-CSRF-Token', csrfToken)
                 .send({
                     username: 'testuser',
                     email: 'test@example.com',
@@ -74,8 +169,10 @@ describe('Authentication Routes', () => {
 
         it('should reject registration with existing email', async () => {
             // First registration
-            await request(app)
+            await request(configuredApp)
                 .post('/auth/register')
+                .set('Cookie', testSession)
+                .set('X-CSRF-Token', csrfToken)
                 .send({
                     username: 'testuser1',
                     email: 'test@example.com',
@@ -83,8 +180,10 @@ describe('Authentication Routes', () => {
                 });
 
             // Second registration with same email
-            const response = await request(app)
+            const response = await request(configuredApp)
                 .post('/auth/register')
+                .set('Cookie', testSession)
+                .set('X-CSRF-Token', csrfToken)
                 .send({
                     username: 'testuser2',
                     email: 'test@example.com',
@@ -106,8 +205,10 @@ describe('Authentication Routes', () => {
         });
 
         it('should login successfully with correct credentials', async () => {
-            const response = await request(app)
+            const response = await request(configuredApp)
                 .post('/auth/login')
+                .set('Cookie', testSession)
+                .set('X-CSRF-Token', csrfToken)
                 .send({
                     email: 'test@example.com',
                     password: 'Test123!@#'
@@ -120,8 +221,10 @@ describe('Authentication Routes', () => {
         });
 
         it('should reject login with incorrect password', async () => {
-            const response = await request(app)
+            const response = await request(configuredApp)
                 .post('/auth/login')
+                .set('Cookie', testSession)
+                .set('X-CSRF-Token', csrfToken)
                 .send({
                     email: 'test@example.com',
                     password: 'wrongpassword'
@@ -138,8 +241,10 @@ describe('Authentication Routes', () => {
                 { $set: { isVerified: false } }
             );
 
-            const response = await request(app)
+            const response = await request(configuredApp)
                 .post('/auth/login')
+                .set('Cookie', testSession)
+                .set('X-CSRF-Token', csrfToken)
                 .send({
                     email: 'test@example.com',
                     password: 'Test123!@#'
@@ -159,14 +264,16 @@ describe('Authentication Routes', () => {
         });
 
         it('should generate reset token for existing user', async () => {
-            const response = await request(app)
+            const response = await request(configuredApp)
                 .post('/auth/forgot-password')
+                .set('Cookie', testSession)
+                .set('X-CSRF-Token', csrfToken)
                 .send({
                     email: 'test@example.com'
                 });
 
             expect(response.status).toBe(200);
-            
+
             // Verify reset token was generated
             const user = await db.collection('users').findOne({ email: 'test@example.com' });
             expect(user.passwordResetToken).toBeTruthy();
@@ -246,16 +353,20 @@ describe('Authentication Routes', () => {
         });
 
         it('should successfully logout user', async () => {
-            const response = await request(app)
+            const response = await request(configuredApp)
                 .post('/auth/logout')
+                .set('Cookie', ['connect.sid=test-session'])
+                .set('X-CSRF-Token', csrfToken)
                 .set('Authorization', `Bearer ${authToken}`);
 
             expect(response.status).toBe(200);
             expect(response.body.message).toContain('Successfully logged out');
 
             // Verify token is blacklisted by attempting to use it
-            const protectedResponse = await request(app)
+            const protectedResponse = await request(configuredApp)
                 .get('/protected-route')
+                .set('Cookie', ['connect.sid=test-session'])
+                .set('X-CSRF-Token', csrfToken)
                 .set('Authorization', `Bearer ${authToken}`);
 
             expect(protectedResponse.status).toBe(401);
