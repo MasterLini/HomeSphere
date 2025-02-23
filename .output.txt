@@ -1,303 +1,250 @@
 
-> interface_page@0.1.0 serve
-> vue-cli-service serve
-
- INFO  Starting development server...
-[?25l[3%] setup (watch run)
-[?25l[2K[1A[2K[G[3%] setup (watch run vue-loader-plugin)
-[?25l[2K[1A[2K[G[3%] setup (watch run webpack-dev-middleware)
-[?25l[2K[1A[2K[G[3%] setup (watch run)
-[?25l[2K[1A[2K[G[4%] setup (normal module factory)
-[?25l[2K[1A[2K[G[4%] setup (normal module factory CaseSensitivePathsPlugin)
-[?25l[2K[1A[2K[G[4%] setup (normal module factory)
-[?25l[2K[1A[2K[G[5%] setup (context module factory)
-[?25l[2K[1A[2K[G[6%] setup (before compile)
-[?25l[2K[1A[2K[G[6%] setup (before compile ProgressPlugin)
-[?25l[2K[1A[2K[G[6%] setup (before compile)
-[?25l[2K[1A[2K[G[7%] setup (compile)
-[?25l[2K[1A[2K[G[7%] setup (compile ExternalsPlugin)
-[?25l[2K[1A[2K[G[7%] setup (compile)
-[?25l[2K[1A[2K[G[8%] setup (compilation)
-[?25l[2K[1A[2K[G[8%] setup (compilation HtmlWebpackPlugin)
-[?25l[2K[1A[2K[G[8%] setup (compilation CopyPlugin)
-[?25l[2K[1A[2K[G[8%] setup (compilation ArrayPushCallbackChunkFormatPlugin)
-[?25l[2K[1A[2K[G[8%] setup (compilation JsonpChunkLoadingPlugin)
-[?25l[2K[1A[2K[G[8%] setup (compilation StartupChunkDependenciesPlugin)
-[?25l[2K[1A[2K[G[8%] setup (compilation ImportScriptsChunkLoadingPlugin)
-[?25l[2K[1A[2K[G[8%] setup (compilation FetchCompileWasmPlugin)
-[?25l[2K[1A[2K[G[8%] setup (compilation FetchCompileAsyncWasmPlugin)
-[?25l[2K[1A[2K[G[8%] setup (compilation WorkerPlugin)
-[?25l[2K[1A[2K[G[8%] setup (compilation SplitChunksPlugin)
-[?25l[2K[1A[2K[G[8%] setup (compilation ResolverCachePlugin)
-[?25l[2K[1A[2K[G[8%] setup (compilation)
-[?25l[2K[1A[2K[G[9%] setup (compilation)
-[?25l[2K[1A[2K[G[9%] setup (compilation vue-loader-plugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation DefinePlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation ProgressPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation EntryPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation ChunkPrefetchPreloadPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation ModuleInfoHeaderPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation EvalSourceMapDevToolPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation JavascriptModulesPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation JsonModulesPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation AssetModulesPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation EntryPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation RuntimePlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation InferAsyncModulesPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation DataUriPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation FileUriPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation CompatibilityPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation HarmonyModulesPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation AMDPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation RequireJsStuffPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation CommonJsPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation LoaderPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation NodeStuffPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation APIPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation ExportsInfoApiPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation WebpackIsIncludedPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation ConstPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation UseStrictPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation RequireIncludePlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation RequireEnsurePlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation RequireContextPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation ImportPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation ImportMetaContextPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation SystemPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation ImportMetaPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation URLPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation DefaultStatsFactoryPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation DefaultStatsPresetPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation DefaultStatsPrinterPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation JavascriptMetaInfoPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation EnsureChunkConditionsPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation RemoveEmptyChunksPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation MergeDuplicateChunksPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation SideEffectsFlagPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation FlagDependencyExportsPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation NamedModuleIdsPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation NamedChunkIdsPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation DefinePlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation TemplatedPathPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation RecordIdsPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation WarnCaseSensitiveModulesPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation EntryPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation ProvidePlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation HotModuleReplacementPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation ProgressPlugin)
-[?25l[2K[1A[2K[G[9%] setup (compilation)
-[?25l[2K[1A[2K[G[10%] building 
-[?25l[2K[1A[2K[G[10%] building (0/0 modules)
-[?25l[2K[1A[2K[G[10%] building (import loader babel-loader/lib/index.js)
-[?25l[2K[1A[2K[G[10%] building (0/2 modules)
-[?25l[2K[1A[2K[G[24%] building (3/7 modules)
-[?25l[2K[1A[2K[G[24%] building (import loader vue-loader/dist/index.js)
-[?25l[2K[1A[2K[G[24%] building (6/16 modules)
-[?25l[2K[1A[2K[G[24%] building (import loader vue-style-loader/index.js)
-[?25l[2K[1A[2K[G[24%] building (import loader css-loader/dist/cjs.js)
-[?25l[2K[1A[2K[G[24%] building (import loader postcss-loader/dist/cjs.js)
-[?25l[2K[1A[2K[G[24%] building (7/32 modules)
-[?25l[2K[1A[2K[G[24%] building (import loader vue-loader/dist/pitcher.js)
-[?25l[2K[1A[2K[G[24%] building (7/41 modules)
-[?25l[2K[1A[2K[G[24%] building (import loader vue-loader/dist/templateLoader.js)
-[?25l[2K[1A[2K[G[24%] building (7/43 modules)
-[?25l[2K[1A[2K[G[24%] building (import loader vue-loader/dist/stylePostLoader.js)
-[?25l[2K[1A[2K[G[24%] building (7/47 modules)
-[?25l[2K[1A[2K[G[38%] building (39/184 modules)
-[?25l[2K[1A[2K[G[51%] building (203/308 modules)
-[?25l[2K[1A[2K[G[51%] building (400/460 modules)
-[?25l[2K[1A[2K[G[65%] building (487/487 modules)
-[?25l[2K[1A[2K[G[65%] building 
-[?25l[2K[1A[2K[G[69%] building (finish)
-[?25l[2K[1A[2K[G[70%] sealing (finish module graph)
-[?25l[2K[1A[2K[G[70%] sealing (finish module graph ResolverCachePlugin)
-[?25l[2K[1A[2K[G[70%] sealing (finish module graph InferAsyncModulesPlugin)
-[?25l[2K[1A[2K[G[70%] sealing (finish module graph FlagDependencyExportsPlugin)
-[?25l[2K[1A[2K[G[70%] sealing (finish module graph)
-[?25l[2K[1A[2K[G[71%] sealing (plugins)
-[?25l[2K[1A[2K[G[71%] sealing (plugins WarnCaseSensitiveModulesPlugin)
-[?25l[2K[1A[2K[G[71%] sealing (plugins)
-[?25l[2K[1A[2K[G[71%] sealing (dependencies optimization)
-[?25l[2K[1A[2K[G[71%] sealing (dependencies optimization SideEffectsFlagPlugin)
-[?25l[2K[1A[2K[G[71%] sealing (dependencies optimization)
-[?25l[2K[1A[2K[G[72%] sealing (after dependencies optimization)
-[?25l[2K[1A[2K[G[73%] sealing (chunk graph)
-[?25l[2K[1A[2K[G[73%] sealing (after chunk graph)
-[?25l[2K[1A[2K[G[74%] sealing (optimizing)
-[?25l[2K[1A[2K[G[74%] sealing (module optimization)
-[?25l[2K[1A[2K[G[75%] sealing (after module optimization)
-[?25l[2K[1A[2K[G[76%] sealing (chunk optimization)
-[?25l[2K[1A[2K[G[76%] sealing (chunk optimization EnsureChunkConditionsPlugin)
-[?25l[2K[1A[2K[G[76%] sealing (chunk optimization RemoveEmptyChunksPlugin)
-[?25l[2K[1A[2K[G[76%] sealing (chunk optimization SplitChunksPlugin)
-[?25l[2K[1A[2K[G[76%] sealing (chunk optimization RemoveEmptyChunksPlugin)
-[?25l[2K[1A[2K[G[76%] sealing (chunk optimization MergeDuplicateChunksPlugin)
-[?25l[2K[1A[2K[G[76%] sealing (chunk optimization)
-[?25l[2K[1A[2K[G[76%] sealing (after chunk optimization)
-[?25l[2K[1A[2K[G[77%] sealing (module and chunk tree optimization)
-[?25l[2K[1A[2K[G[77%] sealing (module and chunk tree optimization PersistentChildCompilerSingletonPlugin)
-[?25l[2K[1A[2K[G[77%] sealing (module and chunk tree optimization)
-[?25l[2K[1A[2K[G[78%] sealing (after module and chunk tree optimization)
-[?25l[2K[1A[2K[G[78%] sealing (chunk modules optimization)
-[?25l[2K[1A[2K[G[79%] sealing (after chunk modules optimization)
-[?25l[2K[1A[2K[G[80%] sealing (module reviving)
-[?25l[2K[1A[2K[G[80%] sealing (module reviving RecordIdsPlugin)
-[?25l[2K[1A[2K[G[80%] sealing (module reviving)
-[?25l[2K[1A[2K[G[80%] sealing (before module ids)
-[?25l[2K[1A[2K[G[81%] sealing (module ids)
-[?25l[2K[1A[2K[G[81%] sealing (module ids NamedModuleIdsPlugin)
-[?25l[2K[1A[2K[G[81%] sealing (module ids)
-[?25l[2K[1A[2K[G[82%] sealing (module id optimization)
-[?25l[2K[1A[2K[G[82%] sealing (module id optimization)
-[?25l[2K[1A[2K[G[83%] sealing (chunk reviving)
-[?25l[2K[1A[2K[G[83%] sealing (chunk reviving RecordIdsPlugin)
-[?25l[2K[1A[2K[G[83%] sealing (chunk reviving)
-[?25l[2K[1A[2K[G[83%] sealing (before chunk ids)
-[?25l[2K[1A[2K[G[84%] sealing (chunk ids)
-[?25l[2K[1A[2K[G[84%] sealing (chunk ids NamedChunkIdsPlugin)
-[?25l[2K[1A[2K[G[84%] sealing (chunk ids)
-[?25l[2K[1A[2K[G[85%] sealing (chunk id optimization)
-[?25l[2K[1A[2K[G[85%] sealing (after chunk id optimization)
-[?25l[2K[1A[2K[G[86%] sealing (record modules)
-[?25l[2K[1A[2K[G[86%] sealing (record modules RecordIdsPlugin)
-[?25l[2K[1A[2K[G[86%] sealing (record modules)
-[?25l[2K[1A[2K[G[87%] sealing (record chunks)
-[?25l[2K[1A[2K[G[87%] sealing (record chunks RecordIdsPlugin)
-[?25l[2K[1A[2K[G[87%] sealing (record chunks)
-[?25l[2K[1A[2K[G[87%] sealing (module hashing)
-[?25l[2K[1A[2K[G[88%] sealing (code generation)
-[?25l[2K[1A[2K[G[89%] sealing (runtime requirements)
-[?25l[2K[1A[2K[G[89%] sealing (hashing)
-[?25l[2K[1A[2K[G[90%] sealing (after hashing)
-[?25l[2K[1A[2K[G[91%] sealing (record hash)
-[?25l[2K[1A[2K[G[91%] sealing (module assets processing)
-[?25l[2K[1A[2K[G[92%] sealing (chunk assets processing)
-[?25l[2K[1A[2K[G[92%] sealing (asset processing)
-[?25l[2K[1A[2K[G[92%] sealing (asset processing copy-webpack-plugin)
-[?25l[2K[1A[2K[G[92%] sealing (asset processing HotModuleReplacementPlugin)
-[?25l[2K[1A[2K[G[92%] sealing (asset processing PersistentChildCompilerSingletonPlugin)
-[?25l[2K[1A[2K[G[92%] sealing (asset processing HtmlWebpackPlugin)
-[?25l[2K[1A[2K[G[92%] sealing (asset processing)
-[?25l[2K[1A[2K[G[93%] sealing (after asset optimization)
-[?25l[2K[1A[2K[G[94%] sealing (recording)
-[?25l[2K[1A[2K[G[94%] sealing (recording HotModuleReplacementPlugin)
-[?25l[2K[1A[2K[G[94%] sealing (recording)
-[?25l[2K[1A[2K[G[94%] sealing (after seal)
-[?25l[2K[1A[2K[G[95%] emitting (emit)
-[?25l[2K[1A[2K[G[98%] emitting (after emit)
-[?25l[2K[1A[2K[GBuild finished at 12:21:50 by 0.000s
-[2K[1A[2K[G[?25lBuild finished at 12:21:50 by 0.000s
-[2K[1A[2K[G[?25lBuild finished at 12:21:50 by 0.000s
-[2K[1A[2K[G
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-[1;1H[0J WARNING  Compiled with 3 warnings                                                                                                                                                                                                   12:21:50 PM
-
- warning  in ./src/views/ShoppingListView.vue?vue&type=script&lang=js
-
-export 'fetchLists' (imported as 'fetchLists') was not found in '@/api/lists' (possible exports: createTodoItem, createTodoList, deleteTodoItem, deleteTodoList, getTodoItems, getTodoLists, updateTodoItem, updateTodoList)
-
- warning  in ./src/views/ShoppingListView.vue?vue&type=script&lang=js
-
-export 'createList' (imported as 'createList') was not found in '@/api/lists' (possible exports: createTodoItem, createTodoList, deleteTodoItem, deleteTodoList, getTodoItems, getTodoLists, updateTodoItem, updateTodoList)
-
- warning  in ./src/views/ShoppingListView.vue?vue&type=script&lang=js
-
-export 'deleteList' (imported as 'deleteList') was not found in '@/api/lists' (possible exports: createTodoItem, createTodoList, deleteTodoItem, deleteTodoList, getTodoItems, getTodoLists, updateTodoItem, updateTodoList)
-
-[?25lBuild finished at 12:21:50 by 0.000s
-[2K[1A[2K[G
-  App running at:
-  - Local:   http://localhost:8083/ 
-  - Network: http://192.168.1.67:8083/
-
-  Note that the development build is not optimized.
-  To create a production build, run npm run build.
-
-[?25lBuild finished at 12:21:50 by 0.000s
-[2K[1A[2K[G[?25lBuild finished at 12:21:50 by 0.000s
-[2K[1A[2K[G[?25lBuild finished at 12:21:50 by 0.000s
-[2K[1A[2K[G[?25lBuild finished at 12:21:50 by 0.000s
-[2K[1A[2K[G[?25lBuild finished at 12:21:50 by 0.000s
-[2K[1A[2K[G[?25lBuild finished at 12:21:50 by 0.000s
-[2K[1A[2K[G[?25lBuild finished at 12:21:50 by 0.000s
-[2K[1A[2K[G[?25lBuild finished at 12:21:50 by 0.000s
+> homesphere@1.0.0 dev
+> concurrently --kill-others-on-fail --names "BACKEND,FRONTEND" --prefix "[{name}]" --prefix-colors "cyan.bold,green.bold" "nodemon src/backend/index.js" "cd src/frontend && npm run serve"
+
+[BACKEND] [33m[nodemon] 3.1.9[39m
+[BACKEND] [33m[nodemon] to restart at any time, enter `rs`[39m
+[BACKEND] [33m[nodemon] watching path(s): *.*[39m
+[BACKEND] [33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[BACKEND] [32m[nodemon] starting `node src/backend/index.js index.js`[39m
+[BACKEND] node:internal/modules/cjs/loader:1137
+[BACKEND]   throw err;
+[BACKEND]   ^
+[BACKEND] 
+[BACKEND] Error: Cannot find module '/home/christian/IdeaProjects/HomeSphere_Real/index.js'
+[BACKEND]     at Module._resolveFilename (node:internal/modules/cjs/loader:1134:15)
+[BACKEND]     at Module._load (node:internal/modules/cjs/loader:975:27)
+[BACKEND]     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+[BACKEND]     at node:internal/main/run_main_module:28:49 {
+[BACKEND]   code: 'MODULE_NOT_FOUND',
+[BACKEND]   requireStack: []
+[BACKEND] }
+[BACKEND] 
+[BACKEND] Node.js v18.19.1
+[BACKEND] [31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[FRONTEND] 
+[FRONTEND] > frontend@0.1.0 serve
+[FRONTEND] > vue-cli-service serve
+[FRONTEND] 
+[FRONTEND]  INFO  Starting development server...
+[FRONTEND] [3%] setup (watch run)
+[FRONTEND] [2K[1A[2K[G[3%] setup (watch run vue-loader-plugin)
+[FRONTEND] [2K[1A[2K[G[3%] setup (watch run webpack-dev-middleware)
+[FRONTEND] [2K[1A[2K[G[3%] setup (watch run)
+[FRONTEND] [2K[1A[2K[G[4%] setup (normal module factory)
+[FRONTEND] [2K[1A[2K[G[4%] setup (normal module factory CaseSensitivePathsPlugin)
+[FRONTEND] [2K[1A[2K[G[4%] setup (normal module factory)
+[FRONTEND] [2K[1A[2K[G[5%] setup (context module factory)
+[FRONTEND] [2K[1A[2K[G[6%] setup (before compile)
+[FRONTEND] [2K[1A[2K[G[6%] setup (before compile ProgressPlugin)
+[FRONTEND] [2K[1A[2K[G[6%] setup (before compile)
+[FRONTEND] [2K[1A[2K[G[7%] setup (compile)
+[FRONTEND] [2K[1A[2K[G[7%] setup (compile ExternalsPlugin)
+[FRONTEND] [2K[1A[2K[G[7%] setup (compile)
+[FRONTEND] [2K[1A[2K[G[8%] setup (compilation)
+[FRONTEND] [2K[1A[2K[G[8%] setup (compilation HtmlWebpackPlugin)
+[FRONTEND] [2K[1A[2K[G[8%] setup (compilation CopyPlugin)
+[FRONTEND] [2K[1A[2K[G[8%] setup (compilation ArrayPushCallbackChunkFormatPlugin)
+[FRONTEND] [2K[1A[2K[G[8%] setup (compilation JsonpChunkLoadingPlugin)
+[FRONTEND] [2K[1A[2K[G[8%] setup (compilation StartupChunkDependenciesPlugin)
+[FRONTEND] [2K[1A[2K[G[8%] setup (compilation ImportScriptsChunkLoadingPlugin)
+[FRONTEND] [2K[1A[2K[G[8%] setup (compilation FetchCompileWasmPlugin)
+[FRONTEND] [2K[1A[2K[G[8%] setup (compilation FetchCompileAsyncWasmPlugin)
+[FRONTEND] [2K[1A[2K[G[8%] setup (compilation WorkerPlugin)
+[FRONTEND] [2K[1A[2K[G[8%] setup (compilation SplitChunksPlugin)
+[FRONTEND] [2K[1A[2K[G[8%] setup (compilation ResolverCachePlugin)
+[FRONTEND] [2K[1A[2K[G[8%] setup (compilation)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation vue-loader-plugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation DefinePlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation ProgressPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation EntryPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation ChunkPrefetchPreloadPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation ModuleInfoHeaderPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation EvalSourceMapDevToolPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation JavascriptModulesPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation JsonModulesPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation AssetModulesPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation EntryPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation RuntimePlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation InferAsyncModulesPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation DataUriPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation FileUriPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation CompatibilityPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation HarmonyModulesPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation AMDPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation RequireJsStuffPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation CommonJsPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation LoaderPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation NodeStuffPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation APIPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation ExportsInfoApiPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation WebpackIsIncludedPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation ConstPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation UseStrictPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation RequireIncludePlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation RequireEnsurePlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation RequireContextPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation ImportPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation ImportMetaContextPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation SystemPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation ImportMetaPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation URLPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation DefaultStatsFactoryPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation DefaultStatsPresetPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation DefaultStatsPrinterPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation JavascriptMetaInfoPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation EnsureChunkConditionsPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation RemoveEmptyChunksPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation MergeDuplicateChunksPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation SideEffectsFlagPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation FlagDependencyExportsPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation NamedModuleIdsPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation NamedChunkIdsPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation DefinePlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation TemplatedPathPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation RecordIdsPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation WarnCaseSensitiveModulesPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation EntryPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation ProvidePlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation HotModuleReplacementPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation ProgressPlugin)
+[FRONTEND] [2K[1A[2K[G[9%] setup (compilation)
+[FRONTEND] [2K[1A[2K[G[10%] building 
+[FRONTEND] [2K[1A[2K[G[10%] building (0/0 modules)
+[FRONTEND] [2K[1A[2K[G[10%] building (import loader babel-loader/lib/index.js)
+[FRONTEND] [2K[1A[2K[G[10%] building (0/2 modules)
+[FRONTEND] [2K[1A[2K[G[24%] building (3/7 modules)
+[FRONTEND] [2K[1A[2K[G[24%] building (import loader vue-loader/dist/index.js)
+[FRONTEND] [2K[1A[2K[G[24%] building (3/16 modules)
+[FRONTEND] [2K[1A[2K[G[24%] building (import loader vue-style-loader/index.js)
+[FRONTEND] [2K[1A[2K[G[24%] building (import loader css-loader/dist/cjs.js)
+[FRONTEND] [2K[1A[2K[G[24%] building (import loader postcss-loader/dist/cjs.js)
+[FRONTEND] [2K[1A[2K[G[24%] building (6/18 modules)
+[FRONTEND] [2K[1A[2K[G[24%] building (import loader vue-loader/dist/pitcher.js)
+[FRONTEND] [2K[1A[2K[G[24%] building (7/43 modules)
+[FRONTEND] [2K[1A[2K[G[24%] building (import loader vue-loader/dist/templateLoader.js)
+[FRONTEND] [2K[1A[2K[G[24%] building (7/43 modules)
+[FRONTEND] [2K[1A[2K[G[24%] building (import loader vue-loader/dist/stylePostLoader.js)
+[FRONTEND] [2K[1A[2K[G[24%] building (7/48 modules)
+[FRONTEND] [2K[1A[2K[G[38%] building (39/193 modules)
+[FRONTEND] [2K[1A[2K[G[51%] building (203/289 modules)
+[FRONTEND] [2K[1A[2K[G[51%] building (322/439 modules)
+[FRONTEND] [2K[1A[2K[G[65%] building (481/481 modules)
+[FRONTEND] [2K[1A[2K[G[65%] building 
+[FRONTEND] [2K[1A[2K[G[69%] building (finish)
+[FRONTEND] [2K[1A[2K[G[70%] sealing (finish module graph)
+[FRONTEND] [2K[1A[2K[G[70%] sealing (finish module graph ResolverCachePlugin)
+[FRONTEND] [2K[1A[2K[G[70%] sealing (finish module graph InferAsyncModulesPlugin)
+[FRONTEND] [2K[1A[2K[G[70%] sealing (finish module graph FlagDependencyExportsPlugin)
+[FRONTEND] [2K[1A[2K[G[70%] sealing (finish module graph)
+[FRONTEND] [2K[1A[2K[G[71%] sealing (plugins)
+[FRONTEND] [2K[1A[2K[G[71%] sealing (plugins WarnCaseSensitiveModulesPlugin)
+[FRONTEND] [2K[1A[2K[G[71%] sealing (plugins)
+[FRONTEND] [2K[1A[2K[G[71%] sealing (dependencies optimization)
+[FRONTEND] [2K[1A[2K[G[71%] sealing (dependencies optimization SideEffectsFlagPlugin)
+[FRONTEND] [2K[1A[2K[G[71%] sealing (dependencies optimization)
+[FRONTEND] [2K[1A[2K[G[72%] sealing (after dependencies optimization)
+[FRONTEND] [2K[1A[2K[G[73%] sealing (chunk graph)
+[FRONTEND] [2K[1A[2K[G[73%] sealing (after chunk graph)
+[FRONTEND] [2K[1A[2K[G[74%] sealing (optimizing)
+[FRONTEND] [2K[1A[2K[G[74%] sealing (module optimization)
+[FRONTEND] [2K[1A[2K[G[75%] sealing (after module optimization)
+[FRONTEND] [2K[1A[2K[G[76%] sealing (chunk optimization)
+[FRONTEND] [2K[1A[2K[G[76%] sealing (chunk optimization EnsureChunkConditionsPlugin)
+[FRONTEND] [2K[1A[2K[G[76%] sealing (chunk optimization RemoveEmptyChunksPlugin)
+[FRONTEND] [2K[1A[2K[G[76%] sealing (chunk optimization SplitChunksPlugin)
+[FRONTEND] [2K[1A[2K[G[76%] sealing (chunk optimization RemoveEmptyChunksPlugin)
+[FRONTEND] [2K[1A[2K[G[76%] sealing (chunk optimization MergeDuplicateChunksPlugin)
+[FRONTEND] [2K[1A[2K[G[76%] sealing (chunk optimization)
+[FRONTEND] [2K[1A[2K[G[76%] sealing (after chunk optimization)
+[FRONTEND] [2K[1A[2K[G[77%] sealing (module and chunk tree optimization)
+[FRONTEND] [2K[1A[2K[G[77%] sealing (module and chunk tree optimization PersistentChildCompilerSinglet
+[FRONTEND] onPlugin)
+[FRONTEND] [2K[1A[2K[1A[2K[G[77%] sealing (module and chunk tree optimization)
+[FRONTEND] [2K[1A[2K[G[78%] sealing (after module and chunk tree optimization)
+[FRONTEND] [2K[1A[2K[G[78%] sealing (chunk modules optimization)
+[FRONTEND] [2K[1A[2K[G[79%] sealing (after chunk modules optimization)
+[FRONTEND] [2K[1A[2K[G[80%] sealing (module reviving)
+[FRONTEND] [2K[1A[2K[G[80%] sealing (module reviving RecordIdsPlugin)
+[FRONTEND] [2K[1A[2K[G[80%] sealing (module reviving)
+[FRONTEND] [2K[1A[2K[G[80%] sealing (before module ids)
+[FRONTEND] [2K[1A[2K[G[81%] sealing (module ids)
+[FRONTEND] [2K[1A[2K[G[81%] sealing (module ids NamedModuleIdsPlugin)
+[FRONTEND] [2K[1A[2K[G[81%] sealing (module ids)
+[FRONTEND] [2K[1A[2K[G[82%] sealing (module id optimization)
+[FRONTEND] [2K[1A[2K[G[82%] sealing (module id optimization)
+[FRONTEND] [2K[1A[2K[G[83%] sealing (chunk reviving)
+[FRONTEND] [2K[1A[2K[G[83%] sealing (chunk reviving RecordIdsPlugin)
+[FRONTEND] [2K[1A[2K[G[83%] sealing (chunk reviving)
+[FRONTEND] [2K[1A[2K[G[83%] sealing (before chunk ids)
+[FRONTEND] [2K[1A[2K[G[84%] sealing (chunk ids)
+[FRONTEND] [2K[1A[2K[G[84%] sealing (chunk ids NamedChunkIdsPlugin)
+[FRONTEND] [2K[1A[2K[G[84%] sealing (chunk ids)
+[FRONTEND] [2K[1A[2K[G[85%] sealing (chunk id optimization)
+[FRONTEND] [2K[1A[2K[G[85%] sealing (after chunk id optimization)
+[FRONTEND] [2K[1A[2K[G[86%] sealing (record modules)
+[FRONTEND] [2K[1A[2K[G[86%] sealing (record modules RecordIdsPlugin)
+[FRONTEND] [2K[1A[2K[G[86%] sealing (record modules)
+[FRONTEND] [2K[1A[2K[G[87%] sealing (record chunks)
+[FRONTEND] [2K[1A[2K[G[87%] sealing (record chunks RecordIdsPlugin)
+[FRONTEND] [2K[1A[2K[G[87%] sealing (record chunks)
+[FRONTEND] [2K[1A[2K[G[87%] sealing (module hashing)
+[FRONTEND] [2K[1A[2K[G[88%] sealing (code generation)
+[FRONTEND] [2K[1A[2K[G[89%] sealing (runtime requirements)
+[FRONTEND] [2K[1A[2K[G[89%] sealing (hashing)
+[FRONTEND] [2K[1A[2K[G[90%] sealing (after hashing)
+[FRONTEND] [2K[1A[2K[G[91%] sealing (record hash)
+[FRONTEND] [2K[1A[2K[G[91%] sealing (module assets processing)
+[FRONTEND] [2K[1A[2K[G[92%] sealing (chunk assets processing)
+[FRONTEND] [2K[1A[2K[G[92%] sealing (asset processing)
+[FRONTEND] [2K[1A[2K[G[92%] sealing (asset processing copy-webpack-plugin)
+[FRONTEND] [2K[1A[2K[G[92%] sealing (asset processing HotModuleReplacementPlugin)
+[FRONTEND] [2K[1A[2K[G[92%] sealing (asset processing PersistentChildCompilerSingletonPlugin)
+[FRONTEND] [2K[1A[2K[G[92%] sealing (asset processing HtmlWebpackPlugin)
+[FRONTEND] [2K[1A[2K[G[92%] sealing (asset processing)
+[FRONTEND] [2K[1A[2K[G[93%] sealing (after asset optimization)
+[FRONTEND] [2K[1A[2K[G[94%] sealing (recording)
+[FRONTEND] [2K[1A[2K[G[94%] sealing (recording HotModuleReplacementPlugin)
+[FRONTEND] [2K[1A[2K[G[94%] sealing (recording)
+[FRONTEND] [2K[1A[2K[G[94%] sealing (after seal)
+[FRONTEND] [2K[1A[2K[G[95%] emitting (emit)
+[FRONTEND] [2K[1A[2K[G[98%] emitting (after emit)
+[FRONTEND] [2K[1A[2K[GBuild finished at 16:59:40 by 0.000s
+[2K[1A[2K[GBuild finished at 16:59:40 by 0.000s
+[FRONTEND] [2K[1A[2K[GBuild finished at 16:59:40 by 0.000s
+[2K[1A[2K[G ERROR  Failed to compile with 2 errors4:59:40 PM
+[FRONTEND] 
+[FRONTEND]  error  in ./src/views/ShoppingListView.vue?vue&type=script&lang=js
+[FRONTEND] 
+[FRONTEND] Module not found: Error: Can't resolve '@/api/shopping' in '/home/christian/IdeaProjects/HomeSphere_Real/src/frontend/src/views'
+[FRONTEND] 
+[FRONTEND]  error  in ./src/views/ToDoView.vue?vue&type=script&lang=js
+[FRONTEND] 
+[FRONTEND] Module not found: Error: Can't resolve '@/api/lists' in '/home/christian/IdeaProjects/HomeSphere_Real/src/frontend/src/views'
+[FRONTEND] 
+[FRONTEND] Build finished at 16:59:40 by 0.000s
+[2K[1A[2K[GBuild finished at 16:59:40 by 0.000s
+[2K[1A[2K[GBuild finished at 16:59:40 by 0.000s
+[2K[1A[2K[GBuild finished at 16:59:40 by 0.000s
+[2K[1A[2K[GBuild finished at 16:59:40 by 0.000s
+[2K[1A[2K[GBuild finished at 16:59:40 by 0.000s
+[2K[1A[2K[GBuild finished at 16:59:40 by 0.000s
+[2K[1A[2K[GBuild finished at 16:59:40 by 0.000s
+[2K[1A[2K[GBuild finished at 16:59:40 by 0.000s
+[2K[1A[2K[GERROR in ./src/views/ShoppingListView.vue?vue&type=script&lang=js (./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./src/views/ShoppingListView.vue?vue&type=script&lang=js) 6:0-167
+[FRONTEND] Module not found: Error: Can't resolve '@/api/shopping' in '/home/christian/IdeaProjects/HomeSphere_Real/src/frontend/src/views'
+[FRONTEND]  @ ./src/views/ShoppingListView.vue?vue&type=script&lang=js 1:0-208 1:0-208 1:209-406 1:209-406
+[FRONTEND]  @ ./src/views/ShoppingListView.vue 2:0-67 3:0-62 3:0-62 8:49-55
+[FRONTEND]  @ ./src/router/index.js 9:0-60 55:13-29
+[FRONTEND]  @ ./src/main.js 3:0-30 9:19-25
+[FRONTEND] 
+[FRONTEND] ERROR in ./src/views/ToDoView.vue?vue&type=script&lang=js (./node_modules/babel-loader/lib/index.js??clonedRuleSet-40.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./src/views/ToDoView.vue?vue&type=script&lang=js) 6:0-91
+[FRONTEND] Module not found: Error: Can't resolve '@/api/lists' in '/home/christian/IdeaProjects/HomeSphere_Real/src/frontend/src/views'
+[FRONTEND]  @ ./src/views/ToDoView.vue?vue&type=script&lang=js 1:0-200 1:0-200 1:201-390 1:201-390
+[FRONTEND]  @ ./src/views/ToDoView.vue 2:0-59 3:0-54 3:0-54 8:49-55
+[FRONTEND]  @ ./src/router/index.js 7:0-45 48:13-21
+[FRONTEND]  @ ./src/main.js 3:0-30 9:19-25
+[FRONTEND] 
+[FRONTEND] webpack compiled with 2 errors
 EXECUTION TIMED OUT AND SUSPENDED

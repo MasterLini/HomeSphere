@@ -9,9 +9,9 @@
     "test:coverage": "jest --coverage",
     "start": "concurrently --kill-others-on-fail --names \"BACKEND,FRONTEND\" --prefix \"[{name}]\" --prefix-colors \"cyan.bold,green.bold\" \"npm run start:backend\" \"npm run start:frontend\"",
     "start:backend": "node src/backend/index.js",
-    "start:frontend": "cd src/interface_page && npm start",
-    "dev": "concurrently --kill-others-on-fail --names \"BACKEND,FRONTEND\" --prefix \"[{name}]\" --prefix-colors \"cyan.bold,green.bold\" \"nodemon src/backend/index.js\" \"cd src/interface_page && npm run serve\"",
-    "install:all": "npm install && cd src/interface_page && npm install"
+    "start:frontend": "cd src/frontend && npm start",
+    "dev": "concurrently --kill-others-on-fail --names \"BACKEND,FRONTEND\" --prefix \"[{name}]\" --prefix-colors \"cyan.bold,green.bold\" \"nodemon src/backend/index.js\" \"cd src/frontend && npm run serve\"",
+    "install:all": "npm install && cd src/frontend && npm install"
   },
   "repository": {
     "type": "git",
