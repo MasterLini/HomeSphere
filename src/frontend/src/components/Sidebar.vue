@@ -27,12 +27,6 @@
             <span class="tooltip">Shopping List</span>
           </router-link>
         </li>
-        <li class="nav-item">
-          <router-link to="/contact" class="nav-link" active-class="active">
-            <span class="icon">&#128222;</span>
-            <span class="tooltip">Contact</span>
-          </router-link>
-        </li>
       </div>  
       <div class="bottom-nav">
         <div class="nav-item">
