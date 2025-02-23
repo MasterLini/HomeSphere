@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { login } from '@/api/auth';
+import { login } from '@/api/auth'
 
 export default {
   name: 'LoginForm',
@@ -70,20 +70,20 @@ export default {
       this.isLoading = true;
 
       try {
-        await login(this.loginForm);
+        const response = await login(this.loginForm);
+        const token = response.data.token;
+        localStorage.setItem('token', token);
 
-        // Get redirect path from query parameters
+        // Redirect to intended destination or home
         const redirectPath = this.$route.query.redirect;
-
-        // Validate redirect path if it exists
         if (redirectPath && redirectPath.startsWith('/') && !redirectPath.startsWith('//')) {
           this.$router.push(redirectPath);
         } else {
           this.$router.push({ name: 'home' });
         }
-      } catch (error) {
-        console.error('Login failed:', error);
-        this.error = error.response?.data?.message || 'Login failed. Please check your credentials and try again.';
+      } catch (err) {
+        console.error('Login failed:', err);
+        this.error = err.response?.data?.message || 'Login failed. Please check your credentials and try again.';
       } finally {
         this.isLoading = false;
       }

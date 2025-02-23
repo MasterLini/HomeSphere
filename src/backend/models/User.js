@@ -1,10 +1,11 @@
-// models/User.js
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
 const userSchema = new mongoose.Schema(
     {
-        name: { type: String, required: true },
+        username: { type: String, required: true, unique: true, trim: true },
+        firstName: { type: String, required: true },
+        lastName: { type: String, required: true },
         email: {
             type: String,
             required: true,
@@ -13,6 +14,10 @@ const userSchema = new mongoose.Schema(
             trim: true
         },
         password: { type: String, required: true },
+        profileImage: { type: String, default: 'default-profile.png' },
+        role: { type: String, enum: ['admin', 'member'], default: 'member' },
+        demoId: { type: String, default: 'DEMO-USER' },
+        family: { type: mongoose.Schema.Types.ObjectId, ref: 'Family' },
         isVerified: { type: Boolean, default: false },
         verificationToken: { type: String },
         resetPasswordToken: { type: String },
@@ -21,7 +26,6 @@ const userSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Pre-save hook to hash password if modified
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
     try {
@@ -33,9 +37,8 @@ userSchema.pre('save', async function (next) {
     }
 });
 
-// Compare password method
-userSchema.methods.comparePassword = async function (candidatePassword) {
-    return bcrypt.compare(candidatePassword, this.password);
+userSchema.methods.comparePassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
 };
 
 const User = mongoose.model('User', userSchema);

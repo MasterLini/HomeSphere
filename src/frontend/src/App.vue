@@ -14,9 +14,10 @@
 
 <script>
 import Sidebar from './components/Sidebar.vue';
-import { getUserInfo } from './api/user';
+import { getUserInfo } from '@/api/auth';
 
 export default {
+  name: 'App',
   components: {
     Sidebar,
   },
@@ -31,15 +32,15 @@ export default {
     }
   },
   mounted() {
-    // First, get the authenticated user info from /users/me
+    // Fetch the authenticated user info from the new /auth/me endpoint.
     getUserInfo()
-      .then(data => {
-        this.user = data;
-        console.log('Authenticated user:', data);
-      })
-      .catch(err => {
-        console.error('Error fetching authenticated user:', err);
-      });
+        .then(response => {
+          this.user = response.data.user;
+          console.log('Authenticated user:', response.data.user);
+        })
+        .catch(err => {
+          console.error('Error fetching authenticated user:', err);
+        });
   }
 };
 </script>

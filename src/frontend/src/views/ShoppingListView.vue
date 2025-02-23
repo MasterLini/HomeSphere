@@ -2,7 +2,7 @@
   <div class="shoppinglist-view">
     <div class="page-header">
       <h1>Einkaufsliste</h1>
-      <p class="subtitle">Befüllen Sie die Einkaufliste nach Ihrer Wahl</p>
+      <p class="subtitle">Befüllen Sie die Einkaufsliste nach Ihrer Wahl</p>
     </div>
 
     <div v-if="error" class="error-message">
@@ -21,32 +21,30 @@
     <div class="card todo-form">
       <form @submit.prevent="addItem" class="form-inline">
         <div class="form-group">
-          <input 
-            v-model="productName" 
-            type="text" 
-            placeholder="Produktname eingeben..." 
-            maxlength="40"
-            class="list-input"
-            :class="{ 'invalid': formError && !productName.trim() }"
-            required
-            @focus="formError = null"
+          <input
+              v-model="productName"
+              type="text"
+              placeholder="Produktname eingeben..."
+              maxlength="40"
+              class="list-input"
+              :class="{ invalid: formError && !productName.trim() }"
+              required
+              @focus="formError = null"
           />
         </div>
         <div class="form-group">
           <input
-            v-model="quantity"
-            type="number"
-            placeholder="Menge eingeben..."
-            min="1"
-            max="9999"
-            step="0.01"
-            class="list-input"
+              v-model="quantity"
+              type="number"
+              placeholder="Menge eingeben..."
+              min="1"
+              max="9999"
+              step="0.01"
+              class="list-input"
           />
         </div>
         <div class="form-group">
-          <select 
-            v-model="unit"            
-            class="list-input">
+          <select v-model="unit" class="list-input">
             <option value="amount">Stück (St.)</option>
             <option value="litre">Liter (L)</option>
             <option value="kilogram">Kilogramm (kg)</option>
@@ -59,67 +57,68 @@
           {{ loading ? 'Wird hinzugefügt...' : 'Hinzufügen' }}
         </button>
       </form>
-    </div>  
+    </div>
 
     <div class="shoppinglist-table" v-show="data.length > 0">
       <table class="table">
+        <thead>
+        <tr>
+          <th>Produkt</th>
+          <th>Menge</th>
+          <th>Einheit</th>
+          <th>Aktionen</th>
+        </tr>
+        </thead>
         <tbody>
-          <tr>
-            <th>Produkt</th>
-            <th>Menge</th>
-            <th>Einheit</th>
-            <th>Aktionen</th>
-          </tr>
-          <tr v-for="(item, index) in data" :key="item.id || index">
-            <td @click="activateEditMode(item, 'productName')" v-show="!(editField === 'productName' && item.inEditMode)">
-              {{ item.productName }}
-            </td>
-            <td v-show="editField === 'productName' && item.inEditMode">
-              <input 
-                type="text" 
-                v-model="item.productName" 
+        <tr v-for="(item, index) in data" :key="item._id || index">
+          <!-- Editable cells: clicking toggles edit mode for that field -->
+          <td @click="activateEditMode(item, 'productName')" v-show="!(editField === 'productName' && item.inEditMode)">
+            {{ item.productName }}
+          </td>
+          <td v-show="editField === 'productName' && item.inEditMode">
+            <input
+                type="text"
+                v-model="item.productName"
                 :placeholder="item.productName"
                 @keyup.enter="deactivateEditMode"
-              >
-            </td>
-            <td @click="activateEditMode(item, 'quantity')" v-show="!(editField === 'quantity' && item.inEditMode)">
-              {{ item.quantity }}
-            </td>
-            <td v-show="editField === 'quantity' && item.inEditMode">
-              <input 
-                type="number" 
-                max="9999" 
-                min="1" 
-                step="0.01" 
-                v-model="item.quantity" 
+            >
+          </td>
+
+          <td @click="activateEditMode(item, 'quantity')" v-show="!(editField === 'quantity' && item.inEditMode)">
+            {{ item.quantity }}
+          </td>
+          <td v-show="editField === 'quantity' && item.inEditMode">
+            <input
+                type="number"
+                min="1"
+                step="0.01"
+                v-model="item.quantity"
                 :placeholder="item.quantity"
                 @keyup.enter="deactivateEditMode"
-              >
-            </td>
-            <td @click="activateEditMode(item, 'unit')" v-show="!(editField === 'unit' && item.inEditMode)">
-              {{ unitOptions[item.unit] }}
-            </td>
-            <td v-show="editField === 'unit' && item.inEditMode">
-              <select 
-                v-model="item.unit" 
+            >
+          </td>
+
+          <td @click="activateEditMode(item, 'unit')" v-show="!(editField === 'unit' && item.inEditMode)">
+            {{ unitOptions[item.unit] }}
+          </td>
+          <td v-show="editField === 'unit' && item.inEditMode">
+            <select
+                v-model="item.unit"
                 class="list-input"
                 @change="deactivateEditMode"
-              >
-                <option v-for="(label, value) in unitOptions" :key="value" :value="value">
-                  {{ label }}
-                </option>
-              </select>
-            </td>
-            <td>
-              <button 
-                @click="removeItem(index)" 
-                class="btn btn-danger"
-                :disabled="loading"
-              >
-                {{ loading ? '...' : 'Löschen' }}
-              </button>
-            </td>
-          </tr>
+            >
+              <option v-for="(label, value) in unitOptions" :key="value" :value="value">
+                {{ label }}
+              </option>
+            </select>
+          </td>
+
+          <td>
+            <button class="btn btn-danger" @click="removeItem(index)" :disabled="loading">
+              {{ loading ? '...' : 'Löschen' }}
+            </button>
+          </td>
+        </tr>
         </tbody>
       </table>
     </div>
@@ -127,39 +126,31 @@
 </template>
 
 <script>
-import ShoppingListItem from '@/components/ShoppingListItem.vue';
-import { getUserInfo } from '@/api/user';
+import { getUserInfo } from '@/api/auth';
 import {
-  getShoppingLists,
-  createShoppingList,
-  updateShoppingList,
-  deleteShoppingList,
-  addShoppingItem,
+  getShoppingItems,
+  createShoppingItem,
   updateShoppingItem,
   deleteShoppingItem
 } from '@/api/shopping';
 
 export default {
   name: "shoppinglist",
-  components: {
-    ShoppingListItem
-  },
   data() {
     return {
       // Form data
-      productName: "", 
+      productName: "",
       quantity: 1,
       unit: "amount",
 
-      // List data
+      // Array of shopping items
       data: [],
-      currentList: null,
 
-      // Edit state
+      // Edit state for inline editing
       editField: "",
       editingItem: null,
 
-      // Options
+      // Options for units
       unitOptions: {
         amount: "Stück (St.)",
         litre: "Liter (L)",
@@ -167,7 +158,7 @@ export default {
         package: "Packung"
       },
 
-      // State
+      // General UI state
       loading: false,
       error: null,
       formError: null,
@@ -182,10 +173,10 @@ export default {
       console.log('[DEBUG] Initializing shopping list view');
 
       // Get authenticated user info
-      const data = await getUserInfo();
-      this.userId = data._id;
+      const response = await getUserInfo();
+      this.userId = response.data.user._id;
 
-      // Initialize shopping list
+      // Initialize shopping list items
       await this.initializeShoppingList();
     } catch (error) {
       console.error('[DEBUG] Error initializing shopping list view:', error);
@@ -194,7 +185,6 @@ export default {
       this.loading = false;
     }
 
-    // Add click outside listener
     document.addEventListener('click', this.handleClickOutside);
   },
 
@@ -212,24 +202,11 @@ export default {
     async initializeShoppingList() {
       try {
         console.log('[DEBUG] Initializing shopping list');
-        const lists = await getShoppingLists();
-
-        // Find or create shopping list
-        let shoppingList = lists.find(list => list.type === 'shoppinglist');
-
-        if (!shoppingList) {
-          console.log('[DEBUG] No shopping list found, creating new one');
-          shoppingList = await createShoppingList({
-            userId: this.userId,
-            type: 'shoppinglist',
-            items: []
-          });
-        }
-
-        this.currentList = shoppingList;
-        this.data = shoppingList.items || [];
+        const response = await getShoppingItems();
+        // Expecting response.data.items to be an array of shopping items
+        this.data = response.data.items;
         this.initialized = true;
-        console.log('[DEBUG] Shopping list initialized:', this.currentList._id);
+        console.log('[DEBUG] Shopping list initialized');
       } catch (error) {
         console.error('[DEBUG] Error initializing shopping list:', error);
         this.error = 'Failed to initialize shopping list';
@@ -242,7 +219,6 @@ export default {
         this.formError = 'Please enter a product name';
         return;
       }
-
       try {
         this.loading = true;
         this.formError = null;
@@ -250,14 +226,14 @@ export default {
         const newItem = {
           productName: this.productName.trim(),
           quantity: this.quantity,
-          unit: this.unit,
-          inEditMode: false
+          unit: this.unit
         };
 
-        const updatedList = await addShoppingItem(this.currentList._id, newItem);
-        this.data = updatedList.items;
+        const response = await createShoppingItem(newItem);
+        // Assuming the response returns { item: <newItem> }
+        this.data.push(response.data.item);
 
-        // Reset form
+        // Reset form fields
         this.productName = '';
         this.quantity = 1;
         this.unit = 'amount';
@@ -274,13 +250,8 @@ export default {
         this.loading = true;
         const item = this.data[index];
         console.log('[DEBUG] Removing item:', item);
-
-        const updatedList = await deleteShoppingItem(
-          this.currentList._id,
-          item.id
-        );
-
-        this.data = updatedList.items;
+        await deleteShoppingItem(item._id);
+        this.data.splice(index, 1);
       } catch (error) {
         console.error('[DEBUG] Error removing item:', error);
         this.error = 'Failed to remove item';
@@ -290,10 +261,9 @@ export default {
     },
 
     activateEditMode(item, field) {
-      this.data.forEach((entry) => {
+      this.data.forEach(entry => {
         entry.inEditMode = false;
       });
-
       item.inEditMode = true;
       this.editField = field;
       this.editingItem = item;
@@ -303,7 +273,7 @@ export default {
       if (this.editingItem) {
         await this.updateEditedItem();
       }
-      this.data.forEach((entry) => {
+      this.data.forEach(entry => {
         entry.inEditMode = false;
       });
       this.editField = '';
@@ -315,14 +285,12 @@ export default {
         try {
           this.loading = true;
           console.log('[DEBUG] Updating item:', this.editingItem);
-
-          const updatedList = await updateShoppingItem(
-            this.currentList._id,
-            this.editingItem.id,
-            this.editingItem
-          );
-
-          this.data = updatedList.items;
+          const response = await updateShoppingItem(this.editingItem._id, this.editingItem);
+          // Replace the updated item in the local array
+          const index = this.data.findIndex(item => item._id === this.editingItem._id);
+          if (index !== -1) {
+            this.data.splice(index, 1, response.data.item);
+          }
           this.editingItem = null;
           this.editField = '';
         } catch (error) {

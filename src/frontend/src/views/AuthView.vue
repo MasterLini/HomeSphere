@@ -2,19 +2,21 @@
   <div class="auth-container">
     <div class="auth-card">
       <div class="card-content">
-        <button class="btn btn-lg text-center" @click="goHome"><span><i class="bi bi-arrow-left"></i></span></button>
+        <button class="btn btn-lg text-center" @click="goHome">
+          <span><i class="bi bi-arrow-left"></i></span>
+        </button>
         <h1 class="title">✨ Join Us!</h1>
 
         <div class="tabs">
           <button
-            :class="['tab-btn', { active: isLogin }]"
-            @click="isLogin = true"
+              :class="['tab-btn', { active: isLogin }]"
+              @click="isLogin = true"
           >
             Sign In
           </button>
           <button
-            :class="['tab-btn', { active: !isLogin }]"
-            @click="isLogin = false"
+              :class="['tab-btn', { active: !isLogin }]"
+              @click="isLogin = false"
           >
             Sign Up
           </button>
@@ -23,21 +25,21 @@
         <div class="form-container">
           <transition name="fade" mode="out-in">
             <login-form
-              v-if="isLogin"
-              @submit="handleLogin"
-              key="login"
+                v-if="isLogin"
+                @submit="handleLogin"
+                key="login"
             />
             <register-form
-              v-else
-              @submit="handleRegister"
-              key="register"
+                v-else
+                @submit="handleRegister"
+                key="register"
             />
           </transition>
         </div>
       </div>
       <transition name="fade">
         <div v-if="showBanner" class="alert-banner">
-          📧 Look in your email, a verification email has been sent to this email.
+          📧 Look in your email, a verification email has been sent.
         </div>
       </transition>
     </div>
@@ -47,7 +49,7 @@
 <script>
 import LoginForm from '@/components/auth/LoginForm.vue'
 import RegisterForm from '@/components/auth/RegisterForm.vue'
-import router from '@/router';
+import router from '@/router'
 
 export default {
   name: 'AuthView',
@@ -63,17 +65,19 @@ export default {
   },
   methods: {
     handleLogin(loginData) {
-      console.log('Login:', loginData)
+      // The LoginForm component handles its own API call, so this may be optional.
+      console.log('Login data received:', loginData)
     },
-    handleRegister(registerData) {
-      console.log('Register:', registerData)
+    async handleRegister(registerData) {
+      console.log('Register data received:', registerData)
+      // Show the verification banner after successful registration.
       this.showBanner = true;
       setTimeout(() => {
         this.showBanner = false;
-      }, 5000); // Hide banner after 5 seconds
+      }, 5000);
     },
     goHome() {
-      router.push({path: 'home'})
+      router.push({ path: '/home' })
     }
   }
 }

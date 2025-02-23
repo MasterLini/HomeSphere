@@ -10,16 +10,28 @@ const jwtSecret = process.env.JWT_SECRET || 'your_jwt_secret';
 // Register a new user
 export const register = async (req, res, next) => {
     try {
-        const { name, email, password } = req.body;
-        const existingUser = await User.findOne({ email });
+        const { username, firstName, lastName, email, password, profileImage } = req.body;
+
+        // Check if username or email already exist
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
         if (existingUser) {
-            logger.warn(`Registration attempt with existing email: ${email}`);
-            return res.status(400).json({ message: 'User already exists' });
+            return res.status(400).json({ message: 'Username or Email already exists' });
         }
 
-        // Create a verification token
+        // Create verification token
         const verificationToken = crypto.randomBytes(20).toString('hex');
-        const user = new User({ name, email, password, verificationToken });
+
+        // Create new user
+        const user = new User({
+            username,
+            firstName,
+            lastName,
+            email,
+            password,
+            profileImage,
+            verificationToken
+        });
+
         await user.save();
 
         // Send verification email
@@ -27,17 +39,32 @@ export const register = async (req, res, next) => {
         await sendEmail({
             to: user.email,
             subject: 'HomeSphere - Verify Your Email',
-            text: `Please verify your email by clicking the following link: ${verifyUrl}`,
-            html: `<p>Please verify your email by clicking <a href="${verifyUrl}">here</a>.</p>`,
+            text: `Verify your email by clicking the following link: ${verifyUrl}`,
+            html: `<p>Verify your email by clicking <a href="${verifyUrl}">here</a>.</p>`,
         });
 
-        logger.info(`User registered successfully: ${email}`);
-        res.status(201).json({ message: 'User registered successfully. Please check your email to verify your account.' });
+        res.status(201).json({ message: 'User registered successfully. Please verify your email.' });
     } catch (error) {
         logger.error('Error during user registration:', error);
         next(error);
     }
 };
+
+// Get Full User Info
+export const getUserInfo = async (req, res, next) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ message: 'Not authenticated' });
+        }
+
+        const user = await User.findById(req.user.id).select('-password -verificationToken -resetPasswordToken -resetPasswordExpires');
+
+        res.status(200).json({ user });
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 // Login user
 export const login = async (req, res, next) => {
@@ -91,29 +118,53 @@ export const verifyEmail = async (req, res, next) => {
     }
 };
 
-// Edit profile (requires authentication middleware)
 export const editProfile = async (req, res, next) => {
     try {
-        // Assume authentication middleware sets req.user
         const userId = req.user.id;
-        const { name, password } = req.body;
+        const { username, firstName, lastName, email, profileImage, password } = req.body;
+
         const user = await User.findById(userId);
         if (!user) {
-            logger.warn(`User not found for profile update: ${userId}`);
             return res.status(404).json({ message: 'User not found' });
         }
 
-        if (name) user.name = name;
-        if (password) user.password = password; // pre-save hook will hash it
+        // Prevent username or email duplicates
+        if (username && username !== user.username) {
+            const existingUsername = await User.findOne({ username });
+            if (existingUsername) {
+                return res.status(400).json({ message: 'Username already taken' });
+            }
+            user.username = username;
+        }
+
+        if (email && email !== user.email) {
+            const existingEmail = await User.findOne({ email });
+            if (existingEmail) {
+                return res.status(400).json({ message: 'Email already in use' });
+            }
+            user.email = email;
+        }
+
+        // Update other fields
+        if (firstName) user.firstName = firstName;
+        if (lastName) user.lastName = lastName;
+        if (profileImage) user.profileImage = profileImage;
+
+        // If password is provided, hash it before saving
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(password, salt);
+        }
 
         await user.save();
-        logger.info(`User profile updated: ${user.email}`);
-        res.status(200).json({ message: 'Profile updated successfully' });
+
+        res.status(200).json({ message: 'Profile updated successfully', user });
     } catch (error) {
         logger.error('Error updating profile:', error);
         next(error);
     }
 };
+
 
 // Request password reset
 export const requestPasswordReset = async (req, res, next) => {

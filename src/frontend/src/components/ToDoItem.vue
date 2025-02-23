@@ -1,41 +1,34 @@
 <template>
-  <div
-      class="postIt"
-      :style="{
-      backgroundImage: todo.completed
+  <div class="postIt" :style="{
+      backgroundImage: todo.status === 'completed'
         ? 'url(/postit-green.svg)'
         : 'url(' + randomSvg + ')'
-    }"
-  >
+    }">
     <div class="content">
       <input
           type="checkbox"
-          v-model="todo.completed"
+          :checked="todo.status === 'completed'"
           class="me-2"
           @change="toggleCompleted"
       />
       <br />
-
-      <!-- TRIGGER UPDATE ON BLUR INSTEAD OF ON EVERY INPUT -->
+      <!-- Update on blur -->
       <span
           contenteditable="true"
-          @blur="updateTodo"
-          :class="{ 'completed': todo.completed }"
+          @blur="updateTodoText"
+          :class="{ 'completed': todo.status === 'completed' }"
       >
-        {{ todo.text }}
+        {{ todo.title }}
       </span>
       <br />
-
-      <span :class="{ 'completed': todo.completed }">
+      <span :class="{ 'completed': todo.status === 'completed' }">
         {{ todo.description }}
       </span>
       <br />
-
-      <span :class="{ 'completed': todo.completed }">
-        {{ formatDate(todo.date) }}
+      <span :class="{ 'completed': todo.status === 'completed' }">
+        {{ formatDate(todo.dueDate) }}
       </span>
       <br />
-
       <button class="btn btn-danger btn-sm" @click="remove">&#128465;</button>
     </div>
   </div>
@@ -65,10 +58,7 @@ export default {
     };
   },
   mounted() {
-    // Randomize which background color / style is used
-    this.randomSvg = this.svgVariants[
-        Math.floor(Math.random() * this.svgVariants.length)
-        ];
+    this.randomSvg = this.svgVariants[Math.floor(Math.random() * this.svgVariants.length)];
   },
   methods: {
     remove() {
@@ -77,27 +67,24 @@ export default {
     toggleCompleted() {
       this.$emit("check", {
         index: this.index,
-        completed: this.todo.completed
+        completed: !this.todo.completed
       });
     },
-    updateTodo(event) {
-      // On blur, read the textContent from the span
+    updateTodoText(event) {
       const updatedText = event.target.textContent.trim();
-      this.$emit("update", {
-        index: this.index,
-        newText: updatedText
-      });
+      this.$emit("update", { id: this.todo._id, updates: { title: updatedText } });
     },
     formatDate(date) {
-      if (!date || date.trim() === "") return "";
-      const [yyyy, mm, dd] = date.split("-");
-      return `${dd}-${mm}-${yyyy}`;
+      if (!date) return "";
+      const d = new Date(date);
+      return d.toLocaleDateString();
     }
   }
 };
 </script>
-  
-  <style>
+
+
+<style>
 @import url('https://fonts.googleapis.com/css2?family=Yuji+Mai&display=swap');
 
 .completed {

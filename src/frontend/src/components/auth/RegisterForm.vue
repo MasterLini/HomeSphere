@@ -3,12 +3,12 @@
     <div class="form-group">
       <label>
         <span class="label-icon">👤</span>
-        Username
+        Name
       </label>
       <input
           type="text"
-          v-model="registerForm.username"
-          placeholder="Choose a username"
+          v-model="registerForm.name"
+          placeholder="Your name"
           required
       >
     </div>
@@ -123,7 +123,7 @@ export default {
   data() {
     return {
       registerForm: {
-        username: '',
+        name: '',
         email: '',
         password: '',
         confirmPassword: ''
@@ -157,8 +157,8 @@ export default {
       }
 
       // Validate username
-      if (this.registerForm.username.length < 3) {
-        this.error = 'Username must be at least 3 characters long';
+      if (this.registerForm.name.length < 3) {
+        this.error = 'Name must be at least 3 characters long';
         return false;
       }
 
@@ -190,7 +190,7 @@ export default {
           ...userData,
           password
         });
-        
+
         this.$router.push({ name: 'home' });
       } catch (error) {
         console.error('Registration failed:', error);
@@ -232,7 +232,6 @@ input {
 
 input:focus {
   outline: none;
-  border-color: #4299e1;
 }
 
 .password-input {
@@ -269,7 +268,6 @@ input:focus {
 .submit-btn {
   width: 100%;
   padding: 0.75rem;
-  background-color: #4299e1;
   color: white;
   border: none;
   border-radius: 0.5rem;
@@ -281,10 +279,6 @@ input:focus {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-}
-
-.submit-btn:hover:not(:disabled) {
-  background-color: #3182ce;
 }
 
 .submit-btn:disabled {
@@ -363,7 +357,6 @@ input:focus {
 }
 
 .sign-in-text a {
-  color: #4299e1;
   text-decoration: none;
   font-weight: 600;
 }

@@ -4,11 +4,13 @@ import logger from './logger.js';
 
 // Create a transporter using your SMTP settings
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: false, // Use `true` for port 465, `false` for 587
     auth: {
-        user: process.env.GMAIL_USER,      // your SMTP username
-        pass: process.env.GMAIL_PASS,      // your SMTP password
-    },
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+    }
 });
 
 export const sendEmail = async ({ to, subject, text, html }) => {
