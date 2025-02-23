@@ -1,14 +1,20 @@
-const { ObjectId } = require('mongodb');
+// models/Family.js
+import mongoose from 'mongoose';
 
-class FamilyModel {
-    constructor(name, members = []) {
-        this.name = name.trim(); // Family name
-        this.createdAt = new Date(); // Timestamp
-        this.members = members.map(member => ({
-            role: member.role.trim(), // Role in the family (e.g., Parent, Child)
-            userId: new ObjectId(member.userId), // MongoDB ObjectId for the associated user
-        }));
-    }
-}
+const familySchema = new mongoose.Schema(
+    {
+        name: { type: String, required: true },
+        members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+        invitations: [
+            {
+                email: { type: String },
+                invitationToken: { type: String }
+            }
+        ],
+        joinCode: { type: String, unique: true }
+    },
+    { timestamps: true }
+);
 
-module.exports = FamilyModel;
+const Family = mongoose.model('Family', familySchema);
+export default Family;
