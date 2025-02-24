@@ -42,7 +42,9 @@ export const register = async (req, res, next) => {
             html: `<p>Verify your email by clicking <a href="${verifyUrl}">here</a>.</p>`,
         });
 
-        res.status(201).json({ message: 'User registered successfully. Please verify your email.' });
+        const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '1h' });
+
+        res.status(201).json({ token, message: 'User registered successfully. Please verify your email.' });
     } catch (error) {
         logger.error('Error during user registration:', error);
         next(error);
@@ -68,7 +70,7 @@ export const getUserInfo = async (req, res, next) => {
 // Login user
 export const login = async (req, res, next) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, remember } = req.body;
         const user = await User.findOne({ email });
         if (!user) {
             logger.warn(`Login attempt with invalid email: ${email}`);
@@ -87,7 +89,8 @@ export const login = async (req, res, next) => {
         }
 
         // Generate JWT
-        const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '1h' });
+        const tokenExpiry = remember ? '7d' : '1h';
+        const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: tokenExpiry });
         logger.info(`User logged in successfully: ${email}`);
         res.status(200).json({ token });
     } catch (error) {

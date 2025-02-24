@@ -7,7 +7,9 @@ const todoSchema = new mongoose.Schema(
             dueDate: { type: Date }, // Added dueDate field
             status: { type: String, enum: ['pending', 'completed'], default: 'pending' },
             assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-            family: { type: mongoose.Schema.Types.ObjectId, ref: 'Family', required: true }
+            family: { type: mongoose.Schema.Types.ObjectId, ref: 'Family', required: true },
+            private: { type: Boolean, default: true },
+            createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
     },
     { timestamps: true }
 );

@@ -157,10 +157,10 @@ export default {
     isPasswordValid() {
       const password = this.registerForm.password;
       return password.length >= 8 &&
-        /[A-Z]/.test(password) &&
-        /[a-z]/.test(password) &&
-        /[0-9]/.test(password) &&
-        /[!@#$%^&*]/.test(password);
+          /[A-Z]/.test(password) &&
+          /[a-z]/.test(password) &&
+          /[0-9]/.test(password) &&
+          /[!@#$%^&*]/.test(password);
     }
   },
   methods: {
@@ -205,11 +205,19 @@ export default {
 
       try {
         const { password, confirmPassword, ...userData } = this.registerForm;
-        await register({
+        // Await registration and expect a token (or similar credential) in the response
+        const response = await register({
           ...userData,
           password
         });
 
+        // Auto-login: Save the token locally so the user is recognized as logged in
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+        }
+        // Optionally, store additional user data as needed
+
+        // Redirect to the home page after successful registration
         this.$router.push({ name: 'home' });
       } catch (error) {
         console.error('Registration failed:', error);

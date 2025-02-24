@@ -26,13 +26,11 @@ const routes = [
     path: '/home',
     name: 'home',
     component: HomeView
-    // Unprotected route.
   },
   {
     path: '/about',
     name: 'about',
     component: AboutView
-    // Unprotected route.
   },
   {
     path: '/user',
@@ -59,20 +57,17 @@ const router = createRouter({
   routes
 })
 
-// Global navigation guard
 router.beforeEach((to, from, next) => {
   const auth = isAuthenticated()
 
-  // If the route has meta.redirectIfAuth and the user is authenticated, send them to home.
   if (to.matched.some(record => record.meta.redirectIfAuth) && auth) {
     return next({ name: 'home' })
   }
 
-  // If the route requires authentication and the user is not authenticated, redirect to /auth.
   if (to.matched.some(record => record.meta.requiresAuth) && !auth) {
     return next({
       name: 'auth',
-      query: { redirect: to.fullPath } // Optionally store intended destination.
+      query: { redirect: to.fullPath }
     })
   }
 

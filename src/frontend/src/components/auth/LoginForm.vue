@@ -34,6 +34,15 @@
         </button>
       </div>
     </div>
+    <div class="form-group">
+      <label>
+        <input
+            type="checkbox"
+            v-model="loginForm.remember"
+        >
+        Remember me
+      </label>
+    </div>
     <div v-if="error" class="error-message">
       {{ error }}
     </div>
@@ -57,7 +66,8 @@ export default {
     return {
       loginForm: {
         email: '',
-        password: ''
+        password: '',
+        remember: false
       },
       showPassword: false,
       isLoading: false,

@@ -27,24 +27,36 @@
             <span class="tooltip">Shopping List</span>
           </router-link>
         </li>
-      </div>  
+      </div>
       <div class="bottom-nav">
-        <div class="nav-item">
-          <router-link to="/user" class="nav-link" active-class="active">
-            <span class="icon">&#128100;</span>
-            <span class="tooltip">Profile</span>
-          </router-link>
-        </div>
-        <div class="nav-item">
-          <button @click="handleLogout" class="nav-link logout-btn">
-            <span class="icon">&#128682;</span>
-            <span class="tooltip">Logout</span>
-          </button>
-        </div>
+        <!-- If the user is logged in, show Profile and Logout -->
+        <template v-if="isAuthenticated">
+          <div class="nav-item">
+            <router-link to="/user" class="nav-link" active-class="active">
+              <span class="icon">&#128100;</span>
+              <span class="tooltip">Profile</span>
+            </router-link>
+          </div>
+          <div class="nav-item">
+            <button @click="handleLogout" class="nav-link logout-btn">
+              <span class="icon">&#128682;</span>
+              <span class="tooltip">Logout</span>
+            </button>
+          </div>
+        </template>
+        <!-- Otherwise, display a Login/Register button -->
+        <template v-else>
+          <div class="nav-item">
+            <router-link to="/auth" class="nav-link" active-class="active">
+              <span class="icon">&#128274;</span>
+              <span class="tooltip">Login/Register</span>
+            </router-link>
+          </div>
+        </template>
       </div>
     </div>
 
-    <!-- Hauptinhalt -->
+    <!-- Main Content -->
     <div class="main-content flex-grow-1 p-4">
       <router-view />
     </div>
@@ -54,15 +66,22 @@
 <script>
 import { logout } from '@/api/auth';
 import { useRouter } from 'vue-router';
+import { computed } from 'vue';
 
 export default {
   name: 'Sidebar',
   setup() {
     const router = useRouter();
 
+    // Simple authentication check (replace with your actual auth logic)
+    const isAuthenticated = computed(() => {
+      return !!localStorage.getItem('token');
+    });
+
     const handleLogout = async () => {
       try {
         logout();
+        await localStorage.removeItem('token');
         await router.push('/auth');
       } catch (error) {
         console.error('Logout failed:', error);
@@ -70,7 +89,8 @@ export default {
     };
 
     return {
-      handleLogout
+      handleLogout,
+      isAuthenticated
     };
   }
 };
@@ -145,13 +165,6 @@ export default {
   box-shadow: 0 4px 6px rgba(79, 209, 197, 0.2);
 }
 
-.user-icon {
-  margin-top: auto;
-  display: flex;
-  justify-content: center;
-}
-
-/* Tooltip Styles */
 .tooltip {
   position: absolute;
   left: 100%;
@@ -188,7 +201,7 @@ export default {
 }
 
 .main-content {
-  margin-left: 80px; /* Gleiche Breite wie Sidebar */
+  margin-left: 80px;
 }
 
 .bottom-nav {
