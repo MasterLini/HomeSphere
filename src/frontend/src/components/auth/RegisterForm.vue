@@ -3,12 +3,29 @@
     <div class="form-group">
       <label>
         <span class="label-icon">👤</span>
+        Username
+      </label>
+      <input
+          type="text"
+          v-model="registerForm.username"
+          placeholder="Your Username"
+          required
+      >
+    </div>
+    <div class="form-group">
+      <label>
         Name
       </label>
       <input
           type="text"
-          v-model="registerForm.name"
-          placeholder="Your name"
+          v-model="registerForm.firstName"
+          placeholder="Your Firstname"
+          required
+      >
+      <input
+          type="text"
+          v-model="registerForm.lastName"
+          placeholder="Your Lastname"
           required
       >
     </div>
@@ -123,7 +140,9 @@ export default {
   data() {
     return {
       registerForm: {
-        name: '',
+        username: '',
+        firstName: '',
+        lastName: '',
         email: '',
         password: '',
         confirmPassword: ''
@@ -157,8 +176,8 @@ export default {
       }
 
       // Validate username
-      if (this.registerForm.name.length < 3) {
-        this.error = 'Name must be at least 3 characters long';
+      if (this.registerForm.username.length < 3) {
+        this.error = 'Username must be at least 3 characters long';
         return false;
       }
 

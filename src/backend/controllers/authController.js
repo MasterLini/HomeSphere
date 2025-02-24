@@ -10,7 +10,7 @@ const jwtSecret = process.env.JWT_SECRET || 'your_jwt_secret';
 // Register a new user
 export const register = async (req, res, next) => {
     try {
-        const { username, firstName, lastName, email, password, profileImage } = req.body;
+        const { username, firstName, lastName, email, password } = req.body;
 
         // Check if username or email already exist
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
@@ -28,7 +28,6 @@ export const register = async (req, res, next) => {
             lastName,
             email,
             password,
-            profileImage,
             verificationToken
         });
 
