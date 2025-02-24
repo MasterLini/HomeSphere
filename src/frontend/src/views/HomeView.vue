@@ -78,6 +78,9 @@ export default {
 </script>
 
 <style scoped>
+h3 {
+  white-space: nowrap;
+}
 .container {
   max-width: 900px;
 }
