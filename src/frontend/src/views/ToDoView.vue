@@ -2,7 +2,9 @@
   <div class="todo-view">
     <div class="page-header">
       <h1>ToDo-Liste</h1>
-      <p class="subtitle">Erstellen Sie ganz einfach ToDo's und weisen Sie Familienmitglieder zu</p>
+      <p class="subtitle">
+        Erstellen Sie ganz einfach ToDo's und weisen Sie Familienmitglieder zu
+      </p>
     </div>
 
     <div v-if="error" class="error-message">
@@ -19,6 +21,7 @@
         <div v-if="formError" class="form-error">
           {{ formError }}
         </div>
+        <!-- Todo Title -->
         <div class="form-group">
           <input
               v-model="todoText"
@@ -31,6 +34,7 @@
               @focus="formError = null"
           />
         </div>
+        <!-- Todo Description -->
         <div class="form-group">
           <input
               v-model="todoDescription"
@@ -41,6 +45,7 @@
               @focus="formError = null"
           />
         </div>
+        <!-- Due Date -->
         <div class="form-group">
           <input
               v-model="todoDate"
@@ -52,6 +57,36 @@
               @focus="formError = null"
           />
         </div>
+
+        <!-- Todo Type (only show if user is in a family) -->
+        <div v-if="inFamily" class="form-group">
+          <label>ToDo-Typ:</label>
+          <div class="radio-group">
+            <label>
+              <input type="radio" value="personal" v-model="todoType" /> Persönlich
+            </label>
+            <label>
+              <input type="radio" value="family" v-model="todoType" /> Familie
+            </label>
+          </div>
+        </div>
+
+        <!-- Assigned To (only if family todo is selected) -->
+        <div v-if="inFamily && todoType === 'family'" class="form-group">
+          <label>Familienmitglied zuweisen:</label>
+          <select v-model="assignedTo" class="todo-input">
+            <option value="">Nicht zugewiesen</option>
+            <option
+                v-for="member in familyMembers"
+                :key="member._id"
+                :value="member._id"
+                :disabled="member._id === userId"
+            >
+              {{ member.username }} ({{ member.firstName }})
+            </option>
+          </select>
+        </div>
+
         <button type="submit" class="btn" :disabled="loading">
           <span v-if="loading" class="loading-spinner">🔄</span>
           <span v-else class="icon">✨</span>
@@ -79,20 +114,24 @@
 
 <script>
 import ToDoItem from "../components/ToDoItem.vue";
-import { getTodos, createTodo, updateTodo, deleteTodo } from '@/api/todos';
-import { getUserInfo } from '@/api/auth';
+import { getTodos, createTodo, updateTodo, deleteTodo } from "@/api/todos";
+import { getUserInfo } from "@/api/auth";
+import { getFamilyMembers } from "@/api/family";
 
 export default {
   name: "ToDoView",
-  components: {
-    ToDoItem
-  },
+  components: { ToDoItem },
   data() {
     return {
       userId: null,
+      inFamily: false,
+      familyMembers: [],
       todoText: "",
       todoDescription: "",
       todoDate: "",
+      // New fields for todo type and assignment
+      todoType: "personal", // "personal" or "family"
+      assignedTo: "",
       todos: [],
       isAscending: true,
       loading: false,
@@ -114,13 +153,19 @@ export default {
   async mounted() {
     try {
       this.loading = true;
-      console.log('[DEBUG] ToDoView mounted');
       const userResponse = await getUserInfo();
-      this.userId = userResponse.data.user._id;
+      const user = userResponse.data.user;
+      this.userId = user._id;
+      this.inFamily = !!user.family;
+      if (this.inFamily) {
+        // Fetch family members for assignment options
+        const familyResponse = await getFamilyMembers(user.family);
+        this.familyMembers = familyResponse.data.members;
+      }
       await this.loadTodos();
     } catch (err) {
-      console.error('[DEBUG] Error initializing ToDoView:', err);
-      this.error = 'Failed to load todo list. Please try again.';
+      console.error("[DEBUG] Error initializing ToDoView:", err);
+      this.error = "Failed to load todo list. Please try again.";
     } finally {
       this.loading = false;
     }
@@ -129,40 +174,45 @@ export default {
     async loadTodos() {
       try {
         const response = await getTodos();
-        // Assumes the backend returns { todos: [...] }
         this.todos = response.data.todos;
       } catch (error) {
-        console.error('Error fetching todos:', error);
-        this.error = 'Failed to fetch todos.';
+        console.error("Error fetching todos:", error);
+        this.error = "Failed to fetch todos.";
       }
     },
     async addTodo() {
       this.formError = null;
       if (!this.todoText.trim()) {
-        this.formError = 'Please enter a todo title';
+        this.formError = "Please enter a todo title";
         return;
       }
       if (!this.todoDate) {
-        this.formError = 'Please select a due date';
+        this.formError = "Please select a due date";
         return;
       }
+      // Build new todo object
       const newTodo = {
         title: this.todoText.trim(),
         description: this.todoDescription.trim(),
-        dueDate: this.todoDate, // Ensure your backend accepts "dueDate"
-        status: 'pending'
+        dueDate: this.todoDate,
+        status: "pending",
+        // Flag for family todo based on selection.
+        isFamilyTodo: this.inFamily && this.todoType === "family"
       };
+      if (newTodo.isFamilyTodo && this.assignedTo) {
+        newTodo.assignedTo = this.assignedTo;
+      }
       try {
         const response = await createTodo(newTodo);
-        // Append the new todo to the local array
         this.todos.push(response.data.todo);
-        // Clear form fields
         this.todoText = "";
         this.todoDescription = "";
         this.todoDate = "";
+        this.todoType = "personal";
+        this.assignedTo = "";
       } catch (error) {
-        console.error('Error adding new todo:', error);
-        this.error = 'Failed to add todo item. Please try again.';
+        console.error("Error adding new todo:", error);
+        this.error = "Failed to add todo item. Please try again.";
       }
     },
     sortTodo() {
@@ -198,7 +248,7 @@ export default {
     },
     async updateTodoCompletion({ id, completed }) {
       try {
-        const updates = { status: completed ? 'completed' : 'pending' };
+        const updates = { status: completed ? "completed" : "pending" };
         const response = await updateTodo(id, updates);
         const index = this.todos.findIndex(todo => todo._id === id);
         if (index !== -1) {
@@ -214,10 +264,21 @@ export default {
 </script>
 
 <style scoped>
-body {
-  overflow-x: hidden;
+/* Additional styles for radio group */
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
 }
 
+.radio-group label {
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Existing styles */
 .loading-overlay {
   position: fixed;
   top: 0;
@@ -274,7 +335,7 @@ body {
 
 .form-group input:focus {
   outline: none;
-  border-color: #4fd1c5;
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 0.1875rem rgba(79, 209, 197, 0.1);
 }
 

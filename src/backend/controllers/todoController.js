@@ -59,22 +59,26 @@ export const updateTodo = async (req, res, next) => {
         const familyId = req.user.family;
 
         let todo = await Todo.findOne({ _id: id, family: familyId, private: false });
-
         if (!todo){
             todo = await Todo.findOne({ _id: id, createdBy: req.user._id, private: true });
         }
         if (!todo) {
             return res.status(404).json({ message: 'Todo not found' });
         }
-        Object.assign(todo, updates);
+
+        console.log("Before update:", todo.title);
+        // Use todo.set() instead of Object.assign
+        todo.set(updates);
         await todo.save();
-        logger.info(`Todo updated: ${todo.title}`);
+        console.log("After save:", todo.title);
+
         res.status(200).json({ message: 'Todo updated', todo });
     } catch (error) {
-        logger.error('Error updating todo:', error);
         next(error);
     }
 };
+
+
 
 export const deleteTodo = async (req, res, next) => {
     try {
