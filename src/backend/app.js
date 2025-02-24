@@ -38,6 +38,13 @@ app.use('/api/family', familyRoutes);
 app.use('/api/todos', todoRoutes);
 app.use('/api/shopping', shoppingRoutes);
 
+console.log({
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS ? 'exists' : 'missing'
+});
+
 app.use(errorHandler);
 
 export default app;
