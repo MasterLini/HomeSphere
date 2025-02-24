@@ -65,9 +65,10 @@ export default {
       this.$emit("remove", this.index);
     },
     toggleCompleted() {
+      const newStatus = this.todo.status === 'completed' ? 'pending' : 'completed';
       this.$emit("check", {
-        index: this.index,
-        completed: !this.todo.completed
+        id: this.todo._id,
+        completed: newStatus === 'completed'
       });
     },
     updateTodoText(event) {
