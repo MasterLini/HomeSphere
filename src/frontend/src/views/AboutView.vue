@@ -12,7 +12,6 @@
             <li class="list-group-item"><strong>Familien anlegen und verwalten:</strong> Erstelle Profile für alle Familienmitglieder und behalte so stets den Überblick über ihre Aktivitäten, Aufgaben und Termine.</li>
             <li class="list-group-item"><strong>ToDo-Listen erstellen:</strong> Verwalte Aufgaben und achte darauf, dass alle wichtigen Dinge erledigt werden – sei es für den Haushalt, die Schule oder persönliche Projekte.</li>
             <li class="list-group-item"><strong>Einkaufslisten erstellen:</strong> Plane deine Einkäufe mit Leichtigkeit. Erstelle Listen für den nächsten Supermarktbesuch oder für spezielle Einkäufe und teile sie mit anderen Familienmitgliedern.</li>
-            <li class="list-group-item"><strong>Termine und Erinnerungen:</strong> Verwalte alle wichtigen Termine und setze Erinnerungen, damit keine Geburtstagsfeier, Arzttermin oder andere Veranstaltungen mehr vergessen werden.</li>
             <li class="list-group-item"><strong>Und noch vieles mehr:</strong> HomeSphere wächst mit dir und deiner Familie. Wir arbeiten kontinuierlich daran, neue Funktionen hinzuzufügen, die dir helfen, deinen Alltag noch besser zu organisieren.</li>
         </ul>
   </div>
