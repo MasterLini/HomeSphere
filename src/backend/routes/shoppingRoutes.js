@@ -1,3 +1,4 @@
+// routes/shoppingRoutes.js
 import express from 'express';
 import { createShoppingItem, getShoppingItems, updateShoppingItem, deleteShoppingItem } from '../controllers/shoppingController.js';
 import { protect } from '../middlewares/authMiddleware.js';
