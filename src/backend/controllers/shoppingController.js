@@ -3,18 +3,26 @@ import logger from '../utils/logger.js';
 
 export const createShoppingItem = async (req, res, next) => {
     try {
-        const { name, quantity, notes } = req.body;
+        const { productName, quantity, notes, isFamilyItem } = req.body;
         const familyId = req.user.family;
-        if (!familyId) {
-            return res.status(400).json({ message: 'User does not belong to a family' });
-        }
 
-        const item = new ShoppingItem({
-            name,
+        // Build the item data
+        const itemData = {
+            productName,
             quantity,
             notes,
-            family: familyId
-        });
+            createdBy: req.user._id,
+            private: true // default is personal item
+        };
+
+        // If the user is in a family and the item is marked as a family item,
+        // attach the family id and mark as not private.
+        if (familyId && isFamilyItem) {
+            itemData.family = familyId;
+            itemData.private = false;
+        }
+
+        const item = new ShoppingItem(itemData);
         await item.save();
         logger.info(`Shopping item created: ${item.name}`);
         res.status(201).json({ message: 'Shopping item created', item });
@@ -27,10 +35,17 @@ export const createShoppingItem = async (req, res, next) => {
 export const getShoppingItems = async (req, res, next) => {
     try {
         const familyId = req.user.family;
-        if (!familyId) {
-            return res.status(400).json({ message: 'User does not belong to a family' });
+        let items;
+        if (familyId) {
+            items = await ShoppingItem.find({
+                $or: [
+                    { family: familyId, private: false },
+                    { createdBy: req.user._id, private: true }
+                ]
+            });
+        } else {
+            items = await ShoppingItem.find({ createdBy: req.user._id, private: true });
         }
-        const items = await ShoppingItem.find({ family: familyId });
         res.status(200).json({ items });
     } catch (error) {
         logger.error('Error fetching shopping items:', error);
@@ -38,12 +53,20 @@ export const getShoppingItems = async (req, res, next) => {
     }
 };
 
+
 export const updateShoppingItem = async (req, res, next) => {
     try {
         const { id } = req.params;
         const updates = req.body;
         const familyId = req.user.family;
-        const item = await ShoppingItem.findOne({ _id: id, family: familyId });
+
+        let item = null;
+        if (familyId) {
+            item = await ShoppingItem.findOne({ _id: id, family: familyId, private: false });
+        }
+        if (!item) {
+            item = await ShoppingItem.findOne({ _id: id, createdBy: req.user._id, private: true });
+        }
         if (!item) {
             return res.status(404).json({ message: 'Shopping item not found' });
         }
@@ -57,11 +80,18 @@ export const updateShoppingItem = async (req, res, next) => {
     }
 };
 
+
 export const deleteShoppingItem = async (req, res, next) => {
     try {
         const { id } = req.params;
         const familyId = req.user.family;
-        const item = await ShoppingItem.findOneAndDelete({ _id: id, family: familyId });
+        let item = null;
+        if (familyId) {
+            item = await ShoppingItem.findOneAndDelete({ _id: id, family: familyId, private: false });
+        }
+        if (!item) {
+            item = await ShoppingItem.findOneAndDelete({ _id: id, createdBy: req.user._id, private: true });
+        }
         if (!item) {
             return res.status(404).json({ message: 'Shopping item not found' });
         }
