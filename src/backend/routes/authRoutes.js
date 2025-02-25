@@ -14,7 +14,6 @@ import { protect } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
-// Existing routes...
 router.post('/register', register);
 router.post('/login', login);
 router.get('/verify-email/:token', verifyEmail);
