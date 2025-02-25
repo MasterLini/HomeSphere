@@ -105,8 +105,8 @@
           :todo="todo"
           :index="index"
           @remove="removeTodo(todo._id)"
-          @update="updateTodo({ id: todo._id, updates: $event })"
-          @check="updateTodoCompletion({ id: todo._id, completed: $event })"
+          @update="updateTodo($event)"
+          @check="updateTodoCompletion($event)"
       />
     </div>
   </div>
