@@ -48,12 +48,12 @@
         </div>
         <!-- If user is in a family, let them choose item type -->
         <div class="form-group" v-if="inFamily">
-          <label class="radio-label">
-            <input type="radio" value="private" v-model="itemType" />
+          <label for="private" class="radio-label">
+            <input type="radio" id="private" value="private" v-model="itemType" />
             Privat
           </label>
-          <label class="radio-label">
-            <input type="radio" value="family" v-model="itemType" />
+          <label for="family" class="radio-label">
+            <input type="radio" id="family" value="family" v-model="itemType" />
             Familie
           </label>
         </div>
@@ -213,6 +213,16 @@ export default {
 </script>
 
 <style scoped>
+.radio-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 1rem;
+  font-size: 0.9rem;
+}
+.radio-label input[type="radio"] {
+  margin: 0;
+}
 .shoppinglist-view {
   max-width: 1200px;
   margin: 0 auto;
@@ -264,7 +274,7 @@ export default {
 }
 .card.list-form {
   background: #f9fafb;
-  padding: 1rem;
+  padding: 2rem;
   border-radius: 0.5rem;
   margin-bottom: 2rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);

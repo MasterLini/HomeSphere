@@ -59,6 +59,11 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.1);
 }
 
+input[type="radio"]:focus {
+  box-shadow: none;
+  border-color: transparent;
+}
+
 input::placeholder, textarea::placeholder {
   color: #a0aec0;
 }
