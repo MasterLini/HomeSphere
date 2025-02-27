@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="form-group">
-      <label>
+      <label class="checkbox-label">
         <input
             type="checkbox"
             v-model="loginForm.remember"
@@ -103,6 +103,13 @@ export default {
 </script>
 
 <style scoped>
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
 .form-group {
   margin-bottom: clamp(1rem, 3vw, 1.25rem);
 }
