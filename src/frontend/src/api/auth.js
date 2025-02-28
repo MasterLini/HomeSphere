@@ -7,4 +7,4 @@ export const editProfile = data => apiClient.put('/auth/edit', data);
 export const logout = () => apiClient.post('/auth/logout', {}, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 export const requestPasswordReset = email => apiClient.post('/auth/request-password-reset', { email });
 export const resetPassword = (token, newPassword) => apiClient.post(`/auth/reset-password/${token}`, { password: newPassword });
-export const getUserInfo = () => apiClient.get('/auth/me');
+export const getUserInfo = () => apiClient.get('/auth/me', {}, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });

@@ -315,4 +315,8 @@ export default {
   background-color: #f3f4f6;
   font-weight: 600;
 }
+
+.btn {
+  margin: 5px;
+}
 </style>

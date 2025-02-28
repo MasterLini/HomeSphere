@@ -129,7 +129,7 @@
         <div v-else class="in-family">
           <div class="family-info card">
             <div class="family-header">
-              <h3>Your Family: {{ user.family.name }}</h3>
+              <h3>Your Family: {{ user.family.familyName }}</h3>
               <div class="join-code">
                 <span>Join Code:</span>
                 <code>{{ user.family.joinCode }}</code>
@@ -175,22 +175,7 @@
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-header">
-              <h3>Invite New Member</h3>
-            </div>
-            <form @submit.prevent="inviteMember" class="invite-form">
-              <div class="form-group">
-                <label>Email</label>
-                <div class="input-with-button">
-                  <input v-model="inviteEmail" type="email" required placeholder="Enter email address" />
-                  <button type="submit" class="btn primary" :disabled="familyLoading">
-                    {{ familyLoading ? "Sending..." : "Send" }}
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
+          
         </div>
       </section>
     </main>
@@ -208,6 +193,7 @@ export default {
       activeTab: "profile",
       user: {},
       profile: {},
+      familyName: "",
       isEditing: false,
       profileLoading: false,
       profileError: "",
@@ -237,12 +223,26 @@ export default {
         const res = await getUserInfo();
         this.user = res.data.user;
         this.profile = { ...this.user };
+
         if (this.user.family) {
           const resFam = await getFamilyMembers(this.user.family);
-          this.familyMembers = resFam.data;
+          
+          // Speichert den joinCode und den Namen in der Familie!
+          this.user.family = {
+            _id: this.user.family, // Behalte die ID
+            familyName: resFam.data.familyName, // Holt den Namen aus der API
+            joinCode: resFam.data.joinCode // Holt den Join-Code aus der API
+          };
+
+
+          this.familyMembers = resFam.data.members || [];
         } else {
           this.familyMembers = [];
         }
+
+        console.log("Geladene Familie:", this.user.family); // Prüfen, ob joinCode jetzt existiert
+        console.log("Familienmitglieder:", this.familyMembers);
+
       } catch (error) {
         console.error("Error loading user:", error);
         this.showToast("Failed to load user information.");
@@ -622,6 +622,7 @@ input::placeholder {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
+  margin-left: 5px;
   transition: all var(--animation-speed);
 }
 
@@ -644,12 +645,13 @@ input::placeholder {
 }
 
 .btn.danger {
-  background: var(--danger-color);
+  background: #ca3120;
   color: white;
 }
 
 .btn.danger:hover {
   background: #c0392b;
+  color: black;
 }
 
 .btn:disabled {
@@ -779,10 +781,6 @@ tr:hover {
   color: #616161;
 }
 
-.actions {
-  display: flex;
-  gap: 0.5rem;
-}
 
 /* Input with button */
 .input-with-button {
@@ -830,6 +828,7 @@ tr:hover {
 
   .btn {
     width: 100%;
+    margin-left: 10px;
   }
 
   .header {

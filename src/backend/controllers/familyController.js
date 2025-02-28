@@ -176,7 +176,11 @@ export const getFamilyMembers = async (req, res, next) => {
             profilePic: member.user.profileImage,
             role: member.role
         }));
-        res.status(200).json(members);
+        res.status(200).json({
+            members,
+            familyName: family.name, 
+            joinCode: family.joinCode
+        });
     } catch (error) {
         logger.error('Error fetching family members:', error);
         next(error);

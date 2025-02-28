@@ -71,21 +71,6 @@
           </div>
         </div>
 
-        <!-- Assigned To (only if family todo is selected) -->
-        <div v-if="inFamily && todoType === 'family'" class="form-group">
-          <label>Familienmitglied zuweisen:</label>
-          <select v-model="assignedTo" class="todo-input">
-            <option value="">Nicht zugewiesen</option>
-            <option
-                v-for="member in familyMembers"
-                :key="member._id"
-                :value="member._id"
-                :disabled="member._id === userId"
-            >
-              {{ member.username }} ({{ member.firstName }})
-            </option>
-          </select>
-        </div>
 
         <button type="submit" class="btn" :disabled="loading">
           <span v-if="loading" class="loading-spinner">🔄</span>
@@ -414,6 +399,7 @@ export default {
   font-size: clamp(0.875rem, 2.5vw, 1rem);
   min-height: 2.75rem;
   border-radius: clamp(0.375rem, 1vw, 0.5rem);
+  margin: 5px;
 }
 
 @media (max-width: 768px) {

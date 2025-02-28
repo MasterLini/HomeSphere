@@ -3,20 +3,20 @@ import logger from '../utils/logger.js';
 
 export const createShoppingItem = async (req, res, next) => {
     try {
-        const { productName, quantity, notes, isFamilyItem } = req.body;
+        const { productName, quantity, unit, notes, isFamilyItem } = req.body; // Hier unit hinzugefügt
         const familyId = req.user.family;
 
         // Build the item data
         const itemData = {
             productName,
             quantity,
+            unit, // Hier unit hinzugefügt
             notes,
             createdBy: req.user._id,
             private: true // default is personal item
         };
 
-        // If the user is in a family and the item is marked as a family item,
-        // attach the family id and mark as not private.
+        // Falls das Item für die Familie ist
         if (familyId && isFamilyItem) {
             itemData.family = familyId;
             itemData.private = false;
@@ -24,13 +24,14 @@ export const createShoppingItem = async (req, res, next) => {
 
         const item = new ShoppingItem(itemData);
         await item.save();
-        logger.info(`Shopping item created: ${item.name}`);
+        logger.info(`Shopping item created: ${item.productName}`);
         res.status(201).json({ message: 'Shopping item created', item });
     } catch (error) {
         logger.error('Error creating shopping item:', error);
         next(error);
     }
 };
+
 
 export const getShoppingItems = async (req, res, next) => {
     try {
