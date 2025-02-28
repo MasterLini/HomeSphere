@@ -36,7 +36,7 @@
 h1 {
   font-size: clamp(1.75rem, 5vw, 2.5rem);
   margin-bottom: clamp(1rem, 3vw, 1.5rem);
-  color: var(--primary-color);
+  color: var(--text-color);
 }
 
 h2 {
